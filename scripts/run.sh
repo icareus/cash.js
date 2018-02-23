@@ -10,7 +10,8 @@ fi
 
 docker run -ti \
   -v $PARENT/src:/usr/app/src \
-  -v $PWD/logs/arbitrage.log:/tmp/cash.js/arbitrage.log \
-  -e LOG_DIR=/tmp/cash.js \
   --env-file $PARENT/.env \
+ \
+  -e LOG_DIR=/tmp/cash.js \
+  -v $PWD/logs/:/tmp/cash.js/ \
   ubarbaxor/`basename $PARENT`

@@ -10,7 +10,7 @@ const symbols = [
   'NEOBNB', 'NEOBTC', 'NEOETH'
 ]
 
-outputLog(`LOG START: ${new Date().toISOString()}`)
+outputLog(`LOG_START ${new Date().toISOString()}`)
 
 binance.websockets.depthCache(symbols, (symbol, depth) => {
   store.dispatch({ type: 'update.depth', symbol, depth })
@@ -29,7 +29,15 @@ store.subscribe(_ => {
       const { arbitrage } = data[symbol]
 
       if (arbitrage > 1) {
-        outputLog(`${new Date().toISOString()} ${symbol} ${arbitrage}`)
+        outputLog(JSON.stringify({
+          type: 'arbitrage.status',
+          path: [ symbol.slice(0, 3), symbol.slice(3), symbol.slice(0, 3) ],
+          status: +arbitrage > 1
+            ? `earn ${(+arbitrage - 1).toFixed(arbitrage.split('.')[1].length)}`
+              : +arbitrage < 1
+              ? `loss ${(+arbitrage - 1).toFixed(arbitrage.split('.')[1].length)}`
+              : 'unkn'
+        }, null, 2))
       }
       return {
         ...acc,
