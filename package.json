@@ -1,5 +1,5 @@
 {
-  "name": "cash",
+  "name": "cash.js",
   "version": "1.0.0",
   "repository": "git@github.com:icareus/cash.js.git",
   "description": "",
@@ -14,7 +14,6 @@
     "nodemon": "^1.15.1"
   },
   "dependencies": {
-    "dotenv": "^5.0.0",
     "node-binance-api": "^0.4.21",
     "redux": "^3.7.2"
   }

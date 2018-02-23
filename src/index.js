@@ -1,6 +1,8 @@
 const binance = require('./util/binance')
-const store = require('./store')
 const outputLog = require('./util/log')
+
+const store = require('./store')
+const snapshot = require('./store/selectors')
 
 const symbols = [
   'LTCETH', 'LTCBTC', 'LTCBNB',
@@ -19,8 +21,22 @@ binance.websockets.trades(symbols, (trades) => {
 })
 
 store.subscribe(_ => {
-  process.env.NODE_ENV === 'DEV' && console.log(`${new Date().toISOString()}`)
-  const state = store.getState()
+  console.log(`${new Date().toISOString()}`)
+  const data = snapshot(store.getState())
 
-  console.log(require('./store/selectors')(state))
+  const arbitrages = Object.keys(data).reduce(
+    (acc, symbol) => {
+      const { arbitrage } = data[symbol]
+
+      if (arbitrage > 1) {
+        outputLog(`${new Date().toISOString()} ${symbol} ${arbitrage}`)
+      }
+      return {
+        ...acc,
+        [symbol]: arbitrage
+      }
+    }
+  , {})
+
+  console.log(arbitrages)
 })
