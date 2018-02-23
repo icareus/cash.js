@@ -1,8 +1,8 @@
 ### USAGE ###
 
 Prerequisites :
-If you intend to use scripts/ you'll need a .env file.
-Use your common sense to figure out what's needed or edit the scripts.
+If you intend to use `scripts/` you'll need a .env file.
+Use your common sense to fill then blanks from the template below.
 ```
 # Binance stuff
 APIKEY=
