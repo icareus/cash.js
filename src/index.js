@@ -1,5 +1,7 @@
-const binance = require('./util/binance')
-const outputLog = require('./util/log')
+const {
+  binance,
+  hardLog
+} = require('./util')
 
 const store = require('./store')
 const snapshot = require('./store/selectors')
@@ -10,7 +12,7 @@ const symbols = [
   'NEOBNB', 'NEOBTC', 'NEOETH'
 ]
 
-outputLog(`LOG_START ${new Date().toISOString()}`)
+hardLog(`LOG_START ${new Date().toISOString()}`)
 
 binance.websockets.depthCache(symbols, (symbol, depth) => {
   store.dispatch({ type: 'update.depth', symbol, depth })
@@ -29,13 +31,13 @@ store.subscribe(_ => {
       const { arbitrage } = data[symbol]
 
       if (arbitrage > 1) {
-        outputLog(JSON.stringify({
+        hardLog(JSON.stringify({
           type: 'arbitrage.status',
           path: [ symbol.slice(0, 3), symbol.slice(3), symbol.slice(0, 3) ],
           status: +arbitrage > 1
-            ? `earn ${(+arbitrage - 1).toFixed(arbitrage.split('.')[1].length)}`
+            ? `earn ${fixedTo(arbitrage, (+arbitrage - 1))}`
               : +arbitrage < 1
-              ? `loss ${(+arbitrage - 1).toFixed(arbitrage.split('.')[1].length)}`
+              ? `loss ${fixedTo(arbitrage, (+arbitrage - 1))}`
               : 'unkn'
         }, null, 2))
       }

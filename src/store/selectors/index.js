@@ -1,4 +1,4 @@
-const binance = require('../../util/binance')
+const { binance, fixedTo } = require('../../util')
 
 const view = (state = {}) => Object.keys(state).reduce((acc, symbol) => {
   const view = {
@@ -6,17 +6,9 @@ const view = (state = {}) => Object.keys(state).reduce((acc, symbol) => {
     ask: binance.first(state[symbol].asks || {}),
     mkt: state[symbol].market
   }
-  view.spread = (view.ask - view.bid || 0)
-    .toFixed(view.ask
-        ? view.ask.split('.')[1].length
-        : 1)
-  view.arbitrage = (((0.999 * view.bid) / view.ask) * 0.999)
-    .toFixed(view.ask
-        ? view.ask.split('.')[1].length
-        : 1)
-  // const arbitrage0 = spread - (view.ask * 0.998 * view.bid * 0.998)
-  // const arbitrage1 = spread - (view.ask * 0.9985 * view.bid * 0.9985)
-  // const arbitrage2 = (view.ask * 0.9985 + spread) * 0.9985 - view.ask
+  view.spread = fixedTo(view.ask, (view.ask - view.bid || 0))
+  view.arbitrage = fixedTo(view.ask, (((0.999 * view.bid) / view.ask) * 0.999))
+
   return ({
     ...acc,
     [symbol]: view
