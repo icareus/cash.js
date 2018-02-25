@@ -1,19 +1,16 @@
 const redux = require('redux')
-const { first, sortBids, sortAsks } = require('node-binance-api')
 
 const market = (state = {}, update) => {
   switch (update.type) {
     case 'update.depth':
-      const bids = sortBids(update.depth.bids)
-      const asks = sortAsks(update.depth.asks)
-
+      const { ask, bid, asks, bids } = update
       return ({
         ...state,
-        [update.symbol]: {
-          bid: first(bids),
-          ask: first(asks),
-          bids,
-          asks
+        [update.symbol]: { ...state[update.symbol],
+          ask,
+          bid,
+          asks,
+          bids
         }
       })
     case 'update.trade':

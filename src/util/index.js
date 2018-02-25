@@ -1,7 +1,8 @@
 const utils = {
   binance: require('./binance'),
+  findPair: require('./findPair'),
   fixedTo: require('./fixedTo'),
-  hardLog: require('./hardLog')
+  log: require('./hardLog')
 }
 
 module.exports = utils

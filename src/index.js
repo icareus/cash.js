@@ -1,10 +1,15 @@
+const binance = require('./util/binance')
+const hardLog = require('./util/hardLog')
 const {
-  binance,
-  hardLog
+  fixedTo,
+  findPair
 } = require('./util')
 
 const store = require('./store')
-const snapshot = require('./store/selectors')
+const {
+  paths,
+  simplify
+} = require('./store/selectors')
 
 const symbols = [
   'LTCETH', 'LTCBTC', 'LTCBNB',
@@ -15,38 +20,63 @@ const symbols = [
 hardLog(`LOG_START ${new Date().toISOString()}`)
 
 binance.websockets.depthCache(symbols, (symbol, depth) => {
-  store.dispatch({ type: 'update.depth', symbol, depth })
+  let { bids, asks } = depth
+  bids = binance.sortBids(bids)
+  asks = binance.sortAsks(asks)
+
+  const action = { type: 'update.depth',
+    symbol,
+    ask: binance.first(asks),
+    bid: binance.first(bids),
+    asks,
+    bids
+  }
+  // console.log(action)
+
+  store.dispatch(action)
 })
 
 binance.websockets.trades(symbols, (trades) => {
   store.dispatch({ type: 'update.trade', trades })
 })
 
+// const neighbors = (graph, asset) => asset
+//   ? Object.keys(graph)
+//     .filter(pair => graph[pair][asset])
+//     .reduce((neighbors, pair) => ({ ...neighbors, [pair]: graph[pair][asset] }), {})
+//   : asset => neighbors(graph, asset)
+
 store.subscribe(_ => {
+  const state = store.getState()
   console.log(`${new Date().toISOString()}`)
-  const data = snapshot(store.getState())
+  // const data = simplify(store.getState())
+  // console.log(data)
+  const graph = paths(state)
+  console.log(graph)
+  //
+  const cost = (graph, run) => run
+    ? run.reduce((cost, asset, i) => {
+      const nxt = run[i + 1] ? run[i + 1] : run[0]
+      const hop = [ asset, nxt ]
+      const sym = graph[findPair(graph, hop)]
+      const dst = sym ? sym[asset] : 0
+      return cost * dst
+    }, 1)
+    : run => cost(graph, run)
 
-  const arbitrages = Object.keys(data).reduce(
-    (acc, symbol) => {
-      const { arbitrage } = data[symbol]
+// TODO : DistantMarkets ?
+// -> accessible ?
+// -> find golden pairs ?
 
-      if (arbitrage > 1) {
-        hardLog(JSON.stringify({
-          type: 'arbitrage.status',
-          path: [ symbol.slice(0, 3), symbol.slice(3), symbol.slice(0, 3) ],
-          status: +arbitrage > 1
-            ? `earn ${fixedTo(arbitrage, (+arbitrage - 1))}`
-              : +arbitrage < 1
-              ? `loss ${fixedTo(arbitrage, (+arbitrage - 1))}`
-              : 'unkn'
-        }, null, 2))
-      }
-      return {
-        ...acc,
-        [symbol]: arbitrage
-      }
-    }
-  , {})
-
-  console.log(arbitrages)
+  const arbitrages = [
+    ['ETH', 'NEO', 'BNB'],
+    ['ETH', 'NEO', 'BNB'].reverse(),
+    ['BNB', 'NEO', 'ETH', 'LTC'],
+    ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
+    ['BTC', 'ETH', 'LTC'],
+    ['BTC', 'ETH', 'LTC'].reverse(),
+  ]
+  const costFn = cost(graph)
+  console.log(arbitrages.reduce((acc, arb) => [
+    ...acc, costFn(arb)], []))
 })
