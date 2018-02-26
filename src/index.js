@@ -40,20 +40,14 @@ binance.websockets.trades(symbols, (trades) => {
   store.dispatch({ type: 'update.trade', trades })
 })
 
-// const neighbors = (graph, asset) => asset
-//   ? Object.keys(graph)
-//     .filter(pair => graph[pair][asset])
-//     .reduce((neighbors, pair) => ({ ...neighbors, [pair]: graph[pair][asset] }), {})
-//   : asset => neighbors(graph, asset)
-
 store.subscribe(_ => {
+  console.clear()
+
   const state = store.getState()
   console.log(`${new Date().toISOString()}`)
-  // const data = simplify(store.getState())
-  // console.log(data)
   const graph = paths(state)
   console.log(graph)
-  //
+
   const cost = (graph, run) => run
     ? run.reduce((cost, asset, i) => {
       const nxt = run[i + 1] ? run[i + 1] : run[0]
@@ -69,6 +63,8 @@ store.subscribe(_ => {
 // -> find golden pairs ?
 
   const arbitrages = [
+    ['LTC', 'BNB', 'ETH'],
+    ['LTC', 'BNB', 'ETH'].reverse(),
     ['ETH', 'NEO', 'BNB'],
     ['ETH', 'NEO', 'BNB'].reverse(),
     ['BNB', 'NEO', 'ETH', 'LTC'],
@@ -76,7 +72,13 @@ store.subscribe(_ => {
     ['BTC', 'ETH', 'LTC'],
     ['BTC', 'ETH', 'LTC'].reverse(),
   ]
+
   const costFn = cost(graph)
-  console.log(arbitrages.reduce((acc, arb) => [
-    ...acc, costFn(arb)], []))
+  console.log(arbitrages.reduce((acc, arb) => {
+    const leverage = costFn(arb).toFixed(8)
+
+    return leverage > 1
+      ? [ ...acc, { arbitrage: arb.join('->'), leverage } ]
+      : acc
+  }, []))
 })
