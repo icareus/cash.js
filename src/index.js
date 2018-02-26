@@ -1,14 +1,14 @@
 const binance = require('./util/binance')
 const hardLog = require('./util/hardLog')
 const {
-  fixedTo,
+  // fixedTo,
   findPair
 } = require('./util')
 
 const store = require('./store')
 const {
-  paths,
-  simplify
+  paths // ,
+  // simplify
 } = require('./store/selectors')
 
 const symbols = [
@@ -61,6 +61,7 @@ store.subscribe(_ => {
 // TODO : DistantMarkets ?
 // -> accessible ?
 // -> find golden pairs ?
+// -> find quadrilaterals w/ remote pairs ? NOTE : Not sure the market has any
 
   const arbitrages = [
     ['LTC', 'BNB', 'ETH'],
@@ -76,7 +77,7 @@ store.subscribe(_ => {
   let bellInterval = 0
   const threshold = {
     high: 1.005,
-    low: 1.001
+    low: 1.0001
   }
 
   const costFn = cost(graph)
