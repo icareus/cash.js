@@ -70,15 +70,37 @@ store.subscribe(_ => {
     ['BNB', 'NEO', 'ETH', 'LTC'],
     ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
     ['BTC', 'ETH', 'LTC'],
-    ['BTC', 'ETH', 'LTC'].reverse(),
+    ['BTC', 'ETH', 'LTC'].reverse()
   ]
+
+  let bellInterval = 0
+  const threshold = {
+    high: 1.005,
+    low: 1.001
+  }
 
   const costFn = cost(graph)
   console.log(arbitrages.reduce((acc, arb) => {
+    const bell = '\u0007'
     const leverage = costFn(arb).toFixed(8)
+    const timeStamp = new Date().toISOString()
+    const arbitrage = {
+      arbitrage: arb.join('->'),
+      leverage,
+      timeStamp
+    }
+    if (+leverage > threshold.high && !bellInterval) {
+      console.log(bell)
+      bellInterval = setInterval(_ => {
+        console.log(bell)
+        hardLog(JSON.stringify(arbitrage, null, 2))
+      }, 500)
+    } else if (+leverage < threshold.high) {
+      bellInterval = clearInterval(bellInterval)
+    }
 
-    return leverage > 1
-      ? [ ...acc, { arbitrage: arb.join('->'), leverage } ]
+    return leverage > threshold.low
+      ? [ ...acc, arbitrage ]
       : acc
   }, []))
 })
