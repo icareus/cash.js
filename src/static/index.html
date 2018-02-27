@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>cash.js</title>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      socket.on('action', console.log)
+      socket.on('state', state => {
+        document.querySelector('#renderer').innerText = JSON.stringify(state, null, 2)
+      })
+    </script>
+    <style media="screen">
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .renderer-wrapper {
+        display: inline-block;
+        width: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="renderer-wrapper">
+      <pre id="renderer" class="prettyprint">
+        If you see this, please enable websockets and / or JS.
+      </pre>
+    </div>
+  </body>
+</html>

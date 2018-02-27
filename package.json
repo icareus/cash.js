@@ -14,7 +14,9 @@
     "nodemon": "^1.15.1"
   },
   "dependencies": {
+    "generatorics": "^1.1.0",
     "node-binance-api": "^0.4.21",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "socket.io": "^2.0.4"
   }
 }

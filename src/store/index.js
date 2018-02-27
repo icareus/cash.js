@@ -1,5 +1,7 @@
 const redux = require('redux')
 
+// const { markets: symbols } = require('../util/constants')
+
 const market = (state = {}, update) => {
   switch (update.type) {
     case 'update.depth':

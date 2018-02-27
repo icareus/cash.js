@@ -1,23 +1,22 @@
 const binance = require('./util/binance')
 const hardLog = require('./util/hardLog')
+const io = require('./util/io')
+
 const {
-  // fixedTo,
   findPair
 } = require('./util')
 
 const store = require('./store')
 const {
-  paths // ,
-  // simplify
+  paths: graph
 } = require('./store/selectors')
 
-const symbols = [
-  'LTCETH', 'LTCBTC', 'LTCBNB',
-  'ETHBTC', 'BNBETH', 'BNBBTC',
-  'NEOBNB', 'NEOBTC', 'NEOETH'
-]
+const { markets: symbols } = require('./util/constants')
+const { watch: paths } = require('./util/constants')
 
 hardLog(`LOG_START ${new Date().toISOString()}`)
+console.log({ symbols })
+console.log({ paths })
 
 binance.websockets.depthCache(symbols, (symbol, depth) => {
   let { bids, asks } = depth
@@ -34,54 +33,49 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
   // console.log(action)
 
   store.dispatch(action)
+  io.emit(action)
 })
 
 binance.websockets.trades(symbols, (trades) => {
-  store.dispatch({ type: 'update.trade', trades })
+  const action = { type: 'update.trade', trades }
+
+  store.dispatch(action)
 })
+
+let bellInterval = 0
 
 store.subscribe(_ => {
   console.clear()
 
   const state = store.getState()
-  console.log(`${new Date().toISOString()}`)
-  const graph = paths(state)
-  console.log(graph)
+  io.emit('state', require('./store/selectors/simplify')(state))
 
-  const cost = (graph, run) => run
+  console.log(`${new Date().toISOString()}`)
+  const currentGraph = graph(state)
+  console.log(currentGraph)
+
+  const cost = (currentGraph, run) => run
     ? run.reduce((cost, asset, i) => {
       const nxt = run[i + 1] ? run[i + 1] : run[0]
       const hop = [ asset, nxt ]
-      const sym = graph[findPair(graph, hop)]
+      const sym = currentGraph[findPair(currentGraph, hop)]
       const dst = sym ? sym[asset] : 0
       return cost * dst
     }, 1)
-    : run => cost(graph, run)
+    : run => cost(currentGraph, run)
 
 // TODO : DistantMarkets ?
 // -> accessible ?
 // -> find golden pairs ?
 // -> find quadrilaterals w/ remote pairs ? NOTE : Not sure the market has any
 
-  const arbitrages = [
-    ['LTC', 'BNB', 'ETH'],
-    ['LTC', 'BNB', 'ETH'].reverse(),
-    ['ETH', 'NEO', 'BNB'],
-    ['ETH', 'NEO', 'BNB'].reverse(),
-    ['BNB', 'NEO', 'ETH', 'LTC'],
-    ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
-    ['BTC', 'ETH', 'LTC'],
-    ['BTC', 'ETH', 'LTC'].reverse()
-  ]
-
-  let bellInterval = 0
   const threshold = {
     high: 1.005,
     low: 1.0001
   }
 
   const costFn = cost(graph)
-  console.log(arbitrages.reduce((acc, arb) => {
+  console.log(paths.reduce((acc, arb) => {
     const bell = '\u0007'
     const leverage = costFn(arb).toFixed(8)
     const timeStamp = new Date().toISOString()
@@ -90,14 +84,14 @@ store.subscribe(_ => {
       leverage,
       timeStamp
     }
+    // TODO: Better logging / bell
     if (+leverage > threshold.high && !bellInterval) {
       console.log(bell)
-      bellInterval = setInterval(_ => {
-        console.log(bell)
-        hardLog(JSON.stringify(arbitrage, null, 2))
-      }, 500)
+      // bellInterval = setInterval(_ => {
+      hardLog(JSON.stringify(arbitrage, null, 2))
+      // }, 1000)
     } else if (+leverage < threshold.high) {
-      bellInterval = clearInterval(bellInterval)
+      // bellInterval = clearInterval(bellInterval)
     }
 
     return leverage > threshold.low
