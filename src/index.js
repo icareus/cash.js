@@ -53,6 +53,7 @@ store.subscribe(_ => {
   console.log(`${new Date().toISOString()}`)
   const currentGraph = graph(state)
   console.log(currentGraph)
+  io.emit('graph', currentGraph)
 
   const cost = (currentGraph, run) => run
     ? run.reduce((cost, asset, i) => {
@@ -71,28 +72,26 @@ store.subscribe(_ => {
 
   const threshold = {
     high: 1.005,
-    low: 1.0001
+    low: 1.001
   }
 
   const costFn = cost(currentGraph)
   // console.log(currentGraph)
-  const arbitrages = paths.reduce((acc, arb) => {
+  const arbitrages = paths.reduce((acc, path) => {
     const bell = '\u0007'
-    const leverage = costFn(arb).toFixed(8)
+    const leverage = costFn(path).toFixed(8)
     const timeStamp = new Date().toISOString()
     const arbitrage = {
-      arbitrage: arb.join('->'),
+      arbitrage: path.join('->'),
       leverage,
       timeStamp
     }
     // TODO: Better logging / bell
     if (+leverage > threshold.high && !bellInterval) {
       console.log(bell)
-      // bellInterval = setInterval(_ => {
       hardLog(JSON.stringify(arbitrage, null, 2))
-      // }, 1000)
-    } else if (+leverage < threshold.high) {
-      // bellInterval = clearInterval(bellInterval)
+    } else if (+leverage > threshold.low && +leverage < threshold.high) {
+      console.log(arbitrage)
     }
 
     // return [...acc, arbitrage]

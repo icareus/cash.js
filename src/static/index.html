@@ -3,47 +3,35 @@
   <head>
     <meta charset="utf-8">
     <title>cash.js</title>
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/main.css">
     <script>
       const socket = io();
-      // socket.on('action', console.log)
-      socket.on('state', state => {
-        document.querySelector('#paths')
-          .innerHTML = JSON.stringify(state, null, 2)
-        // PR.prettyprint()
-      })
       socket.on('arbitrages', arbitrages => {
-        document.querySelector('#arbitrages')
-          .innerHTML = JSON.stringify(arbitrages, null, 2)
-        // PR.prettyprint()
+        document.querySelector('#arbitrages > p')
+          .innerText = JSON.stringify(arbitrages, null, 2)
+      })
+      socket.on('graph', graph => {
+        document.querySelector('#graph > p')
+          .innerText = JSON.stringify(graph, null, 2)
+      })
+      socket.on('state', state => {
+        document.querySelector('#state > p')
+        .innerText = JSON.stringify(state, null, 2)
       })
     </script>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      .renderer-wrapper {
-        display: inline-block;
-        width: 50%;
-      }
-      .prettyprint {
-        border: none;
-        display: inline-block;
-      }
-    </style>
   </head>
   <body>
     <div class="renderer-wrapper">
-      <pre id="paths" class="prettyprint lang-js">
-        If you see this, please enable websockets and / or JS.
-      </pre>
-    </div>
-    <div class="renderer-wrapper">
-      <pre id="arbitrages" class="prettyprint">
-        If you see this, please enable websockets and / or JS.
-      </pre>
+      <div id="graph" class="renderer">
+        <code>If you see this, please enable websockets and / or JS.</code>
+      </div>
+      <div id="arbitrages" class="renderer">
+        <code>If you see this, please enable websockets and / or JS.</code>
+      </div>
+      <div id="state" class="renderer">
+        <code>If you see this, please enable websockets and / or JS.</code>
+      </div>
     </div>
   </body>
 </html>

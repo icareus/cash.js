@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+.renderer-wrapper {
+  display: flex;
+  /* flex-direction: row; */
+  /* flex-wrap: wrap; */
+  /* width: 100%; */
+}
+.renderer {
+  border: 1px dashed blue;
+  width: 50%;
+  /* display: inline-flex; */
+}
