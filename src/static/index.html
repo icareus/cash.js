@@ -9,28 +9,28 @@
       const socket = io();
       socket.on('arbitrages', arbitrages => {
         document.querySelector('#arbitrages > p')
-          .innerText = JSON.stringify(arbitrages, null, 2)
+          .innerHTML = `<code>${JSON.stringify(arbitrages, null, 2)}</code>`
       })
       socket.on('graph', graph => {
         document.querySelector('#graph > p')
-          .innerText = JSON.stringify(graph, null, 2)
+          .innerHTML = `<code>${JSON.stringify(graph, null, 2)}</code>`
       })
       socket.on('state', state => {
         document.querySelector('#state > p')
-        .innerText = JSON.stringify(state, null, 2)
+        .innerHTML = `<code>${JSON.stringify(state, null, 2)}</code>`
       })
     </script>
   </head>
   <body>
     <div class="renderer-wrapper">
       <div id="graph" class="renderer">
-        <code>If you see this, please enable websockets and / or JS.</code>
+        <p>If you see this, please enable websockets and / or JS.</p>
       </div>
       <div id="arbitrages" class="renderer">
-        <code>If you see this, please enable websockets and / or JS.</code>
+        <p>If you see this, please enable websockets and / or JS.</p>
       </div>
       <div id="state" class="renderer">
-        <code>If you see this, please enable websockets and / or JS.</code>
+        <p>If you see this, please enable websockets and / or JS.</p>
       </div>
     </div>
   </body>

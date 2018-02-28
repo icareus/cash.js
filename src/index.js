@@ -14,12 +14,13 @@ const {
 const { markets: symbols } = require('./util/constants')
 const { watch: paths } = require('./util/constants')
 
-hardLog(`LOG_START ${new Date().toISOString()}`)
+hardLog(`// LOG_START ${new Date().toISOString()}`)
 console.log({ symbols })
 console.log({ paths })
 
 binance.websockets.depthCache(symbols, (symbol, depth) => {
-  let { bids, asks } = depth
+  let { bids, asks, E: timeStamp } = depth
+
   bids = binance.sortBids(bids)
   asks = binance.sortAsks(asks)
 
@@ -30,14 +31,17 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
     asks,
     bids
   }
-  // console.log(action)
+  console.log(action.type, timeStamp && new Date(timeStamp).toISOString())
 
   store.dispatch(action)
   io.emit(action)
 })
 
 binance.websockets.trades(symbols, (trades) => {
+  const { E: timeStamp } = trades
   const action = { type: 'update.trade', trades }
+
+  console.log(action.type, timeStamp && new Date(timeStamp).toISOString())
 
   store.dispatch(action)
 })
@@ -48,7 +52,7 @@ store.subscribe(_ => {
   console.clear()
 
   const state = store.getState()
-  io.emit('state', require('./store/selectors/simplify')(state))
+  io.volatile.emit('state', require('./store/selectors/simplify')(state))
 
   console.log(`${new Date().toISOString()}`)
   const currentGraph = graph(state)
@@ -89,7 +93,7 @@ store.subscribe(_ => {
     // TODO: Better logging / bell
     if (+leverage > threshold.high && !bellInterval) {
       console.log(bell)
-      hardLog(JSON.stringify(arbitrage, null, 2))
+      hardLog(JSON.stringify(arbitrage, null, 2) + ',')
     } else if (+leverage > threshold.low && +leverage < threshold.high) {
       console.log(arbitrage)
     }

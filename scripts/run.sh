@@ -12,6 +12,7 @@ docker run -ti \
   -v $PARENT/src:/usr/app/src \
   --env-file $PARENT/.env \
   -p 8000:3000 \
+  --restart unless-stopped \
  \
   -e LOG_DIR=/tmp/cash.js \
   -v $PWD/logs/:/tmp/cash.js/ \
