@@ -74,8 +74,9 @@ store.subscribe(_ => {
     low: 1.0001
   }
 
-  const costFn = cost(graph)
-  console.log(paths.reduce((acc, arb) => {
+  const costFn = cost(currentGraph)
+  // console.log(currentGraph)
+  const arbitrages = paths.reduce((acc, arb) => {
     const bell = '\u0007'
     const leverage = costFn(arb).toFixed(8)
     const timeStamp = new Date().toISOString()
@@ -94,8 +95,11 @@ store.subscribe(_ => {
       // bellInterval = clearInterval(bellInterval)
     }
 
+    // return [...acc, arbitrage]
     return leverage > threshold.low
       ? [ ...acc, arbitrage ]
       : acc
-  }, []))
+  }, [])
+
+  io.emit('arbitrages', arbitrages)
 })

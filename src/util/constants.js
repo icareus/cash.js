@@ -14,6 +14,10 @@ const constants = {
     'BNBETH',
     'LTCBNB',
     'LTCUSDT',
+    'NEOUSDT',
+    'ETHUSDT',
+    'BNBUSDT',
+    'BCCUSDT',
     'BTCUSDT'
   ],
   // TODO - Generate these better (this is a shame.)
@@ -29,16 +33,17 @@ const constants = {
     ['BTC', 'ETH', 'LTC'],
     ['BTC', 'ETH', 'LTC'].reverse(),
     ['BNB', 'NEO', 'ETH', 'LTC'],
-    ['BNB', 'NEO', 'LTC', 'ETH'],
-    ['BNB', 'ETH', 'NEO', 'LTC'],
+    ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
     'LTC BTC USDT'.split(' '),
     'LTC BTC USDT'.split(' ').reverse(),
+    'LTC BTC USDT'.split(' '),
+    'LTC BTC USDT'.split(' ').reverse(),
+    'LTC BNB USDT'.split(' '),
+    'LTC BNB USDT'.split(' ').reverse(),
     'LTC BTC USDT NEO'.split(' '),
     'LTC BTC USDT NEO'.split(' ').reverse(),
     'LTC BTC NEO USDT'.split(' '),
-    'LTC BTC NEO USDT'.split(' ').reverse(),
-    'LTC USDT BTC NEO'.split(' '),
-    'LTC USDT BTC NEO'.split(' ').reverse()
+    'LTC BTC NEO USDT'.split(' ').reverse()
   ]
 }
 const assets = constants.markets.reduce((assets, symbol) => {
@@ -48,5 +53,18 @@ const assets = constants.markets.reduce((assets, symbol) => {
   return assets.concat([asset, currency].filter(x => assets.indexOf(x) === -1))
 }, [])
 console.log(assets)
+
+// // TODO : Make this work ?
+// const G = require('generatorics')
+// const paths = []
+// for (let path of G.clone.combination(assets, 3)) {
+//   paths.push(path)
+//
+//   console.log('PATH HERE ---')
+//   console.log(path)
+//   console.log('END PATH HERE ---')
+// }
+//
+// constants.watch = paths
 
 module.exports = constants

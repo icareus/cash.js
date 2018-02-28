@@ -7,12 +7,19 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
-      socket.on('action', console.log)
+      // socket.on('action', console.log)
       socket.on('state', state => {
-        document.querySelector('#renderer').innerText = JSON.stringify(state, null, 2)
+        document.querySelector('#paths')
+          .innerHTML = JSON.stringify(state, null, 2)
+        // PR.prettyprint()
+      })
+      socket.on('arbitrages', arbitrages => {
+        document.querySelector('#arbitrages')
+          .innerHTML = JSON.stringify(arbitrages, null, 2)
+        // PR.prettyprint()
       })
     </script>
-    <style media="screen">
+    <style>
       body {
         margin: 0;
         padding: 0;
@@ -21,11 +28,20 @@
         display: inline-block;
         width: 50%;
       }
+      .prettyprint {
+        border: none;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
     <div class="renderer-wrapper">
-      <pre id="renderer" class="prettyprint">
+      <pre id="paths" class="prettyprint lang-js">
+        If you see this, please enable websockets and / or JS.
+      </pre>
+    </div>
+    <div class="renderer-wrapper">
+      <pre id="arbitrages" class="prettyprint">
         If you see this, please enable websockets and / or JS.
       </pre>
     </div>
