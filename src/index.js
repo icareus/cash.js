@@ -1,5 +1,5 @@
-const binance = require('./util/binance')
-const hardLog = require('./util/hardLog')
+const binance = require('./io/binance')
+const hardLog = require('./io/hardLog')
 const io = require('./util/io')
 
 // const {
@@ -70,7 +70,8 @@ store.subscribe(_ => {
 
   const threshold = {
     high: 1.005,
-    low: 1.001
+    mid: 1.001,
+    low: 0.999
   }
 
   const BELL = '\u0007'
@@ -81,18 +82,31 @@ store.subscribe(_ => {
     // const timeStamp = new Date().toISOString()
     const arbitrage = {
       arbitrage: path.join('->'),
-      leverage// ,
+      leverage,
       // timeStamp
+      v2: path.reduce((coeffs, asset) => {
+        return {
+          ...coeffs,
+          [asset]: currentGraph[asset]
+        }
+      }, {})
     }
-    if (+leverage > threshold.high) { console.log(BELL) }
+    if (+leverage > threshold.high) {
+
+    }
 
     return [...acc, arbitrage]
-  }, [])
+  }, []).sort((a1, a2) => a1.leverage > a2.leverage)
 
   const logworthy = arbitrages
     .filter(arb => +arb.leverage > threshold.low)
-    .sort((a1, a2) => a1.leverage > a2.leverage)
-
   console.log(logworthy)
+
+  const mindworthy = arbitrages
+    .filter(arb => +arb.leverage > threshold.mid)
+
+  if (mindworthy.length) {
+    console.log(BELL)
+  }
   io.emit('arbitrages', logworthy)
 })

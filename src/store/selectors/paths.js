@@ -10,7 +10,7 @@ const paths = data => Object.keys(data).reduce(
 
     const spread = fixedTo(ask, ask - bid)
     // hyper 0...1
-    const greed = 1
+    const greed = 0.75
 
     const path = {
       [asset]: fixedTo(bid, (+bid + (+spread * greed)) * fee),

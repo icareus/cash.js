@@ -1,18 +1,26 @@
-// const graph = state => Object.keys(state).reduce((graph, symbol) => {
-//   const {
-//     ask,
-//     bid,
-//     asset = symbol.slice(0,3),
-//     currency = symbol.slice(3)
-//   } = state[symbol]
+// const fixedTo = require('../../util/fixedTo')
+// const { ratio: fee } = require('../../util/constants').fee
 //
-//   return ({
-//     ...graph,
-//     [symbol]: {
-//       [asset]: 0.999 * ask,
-//       [currency]: 0.999 * bid
+// const paths = data => Object.keys(data).reduce(
+//   (acc, symbol) => {
+//     const asset = symbol.slice(0, 3)
+//     const currency = symbol.slice(3)
+//
+//     const { bid, ask } = data[symbol]
+//
+//     const spread = fixedTo(ask, ask - bid)
+//     // hyper 0...1
+//     const greed = 0.75
+//
+//     const path = {
+//       [asset]: fixedTo(bid, (+bid + (+spread * greed)) * fee),
+//       [currency]: fixedTo(ask, (1 / (+ask - spread * greed)) * fee)
 //     }
-//   })
-// }, {})
+//     return {
+//       ...acc,
+//       [symbol]: path
+//     }
+//   }
+//   , {})
 //
-// module.exports = graph
+// module.exports = paths

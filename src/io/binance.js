@@ -13,3 +13,6 @@ binance.options({
 })
 
 module.exports = binance
+
+// onBalances = balances => Object.keys(balances).reduce((assets, ast) => { const asset = balances[ast] ; return (+asset.available || +asset.onOrder ? {...assets, [ast]: asset} : assets)}, {})
+// B.balance((_, balances) => console.log(onBalances(balances)))
