@@ -36,14 +36,14 @@ const constants = {
     ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
     'LTC BTC USDT'.split(' '),
     'LTC BTC USDT'.split(' ').reverse(),
-    'LTC BTC USDT'.split(' '),
-    'LTC BTC USDT'.split(' ').reverse(),
     'LTC BNB USDT'.split(' '),
     'LTC BNB USDT'.split(' ').reverse(),
     'LTC BTC USDT NEO'.split(' '),
     'LTC BTC USDT NEO'.split(' ').reverse(),
     'LTC BTC NEO USDT'.split(' '),
-    'LTC BTC NEO USDT'.split(' ').reverse()
+    'LTC BTC NEO USDT'.split(' ').reverse(),
+    'NEO BNB USDT'.split(' '),
+    'NEO BNB USDT'.split(' ').reverse()
   ]
 }
 const assets = constants.markets.reduce((assets, symbol) => {

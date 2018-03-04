@@ -16,9 +16,7 @@ const serveStatic = (req, res) => {
   file.pipe(res)
 }
 
-const noport = _ => {
-  const port = 3000
-
+const noport = (port = 3000) => {
   console.log(`No port provided for WS. Using ${port}`)
   return port
 }

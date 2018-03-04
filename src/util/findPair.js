@@ -1,6 +1,8 @@
-const Pair = (state, assets) => assets
-  ? Object.keys(state).find(symbol =>
+const { markets } = require('./constants')
+
+const Pair = (symbols = markets, assets) => assets
+  ? symbols.find(symbol =>
       assets.reduce((acc, val) => acc && symbol.includes(val), true))
-  : assets => Pair(state, assets)
+  : assets => Pair(symbols, assets)
 
 module.exports = Pair

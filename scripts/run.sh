@@ -5,13 +5,13 @@ PARENT=`dirname "$DIR"`
 
 if [ ! -d $PWD/logs ]; then
   mkdir -p $PWD/logs
-  touch $PWD/logs/arbitrage.log
+  touch $PWD/logs/
 fi
 
 docker run -ti \
   -v $PARENT/src:/usr/app/src \
   --env-file $PARENT/.env \
-  -p 8000:3000 \
+  -p 80:3000 \
   --restart on-failure \
  \
   -e LOG_DIR=/tmp/cash.js \
