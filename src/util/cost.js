@@ -1,4 +1,5 @@
 const findPair = require('./findPair')
+const { markets: pairs } = require('./constants')
 
 // const fixedTo = require('../../util/fixedTo')
 // const { ratio: fee } = require('../../util/constants').fee
@@ -28,17 +29,15 @@ const findPair = require('./findPair')
 // module.exports = paths
 
 // Given a graph, compute cost / return from a run thru values
-const cost = (currentGraph, run) => {
-  const pairs = Object.keys(currentGraph)
-
+const cost = (currentPaths, run) => {
   return run
   ? run.reduce((cost, asset, i) => {
     const nxt = run[i + 1] ? run[i + 1] : run[0]
     const hop = [ asset, nxt ]
-    const sym = currentGraph[findPair(pairs, hop)]
+    const sym = currentPaths[findPair(pairs, hop)]
     const dst = sym ? sym[asset] : 0
     return cost * dst
   }, 1)
-  : run => cost(currentGraph, run)
+  : run => cost(currentPaths, run)
 }
 module.exports = cost

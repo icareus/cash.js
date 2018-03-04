@@ -3,6 +3,9 @@ const constants = {
     value: 0.1 / 100,
     ratio: 0.999
   },
+  hyper: {
+    greed: 0.9
+  },
   markets: [
     'LTCETH',
     // 'LTCBTC',
@@ -21,8 +24,6 @@ const constants = {
     // 'BTCUSDT'
   ],
   // TODO - Generate these better (this is a shame.)
-  // 123, 132
-  // 1234, 1243, 1324
   watch: [
     // ['LTC', 'BNB', 'ETH'],
     // ['LTC', 'BNB', 'ETH'].reverse(),
