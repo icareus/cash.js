@@ -5,7 +5,7 @@ const {
   LOG_DIR: dir = '/dev/null'
 } = process.env
 
-console.log(`LOG_DIR: ${path.resolve(path.join(dir, '/'))}`)
+// console.log(`LOG_DIR: ${path.resolve(path.join(dir))}`)
 
 const data = []
 

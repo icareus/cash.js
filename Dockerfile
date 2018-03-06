@@ -2,9 +2,9 @@ FROM      node:9.5
 
 WORKDIR   /usr/app
 
-COPY      package.json .
+COPY      package.json package-lock.json ./
 RUN       npm i
 
-COPY      src .
+COPY      . .
 
 CMD       npm run dev

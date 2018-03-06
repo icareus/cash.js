@@ -1,12 +1,14 @@
-const binance = require('./io/binance')
-const log = require('./io/log')
-const io = require('./util/io')
+const {
+  binance,
+  log,
+  socket: io
+} = require('./io')
 
-const store = require('./store')
 const {
   paths,
   graph
 } = require('./store/selectors')
+const store = require('./store')
 
 const {
   watch: geometries,

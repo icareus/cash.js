@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "repository": "git@github.com:icareus/cash.js.git",
   "description": "",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "ubarbaxor",
@@ -14,9 +14,11 @@
     "nodemon": "^1.15.1"
   },
   "dependencies": {
+    "express": "^4.16.2",
     "generatorics": "^1.1.0",
     "node-binance-api": "^0.4.21",
     "redux": "^3.7.2",
+    "serve-index": "^1.9.1",
     "socket.io": "^2.0.4"
   }
 }
