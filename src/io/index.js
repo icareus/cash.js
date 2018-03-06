@@ -1,7 +1,7 @@
 const binance = require('./binance')
-const hardLog = require('./hardLog')
+const log = require('./log')
 
 module.exports = {
   binance,
-  hardLog
+  log
 }

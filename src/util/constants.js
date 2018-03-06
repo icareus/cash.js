@@ -23,6 +23,11 @@ const constants = {
     // 'BCCUSDT',
     // 'BTCUSDT'
   ],
+  thresholds: {
+    high: 1.005,
+    mid: 1.001,
+    low: 0.999
+  },
   // TODO - Generate these better (this is a shame.)
   watch: [
     // ['LTC', 'BNB', 'ETH'],

@@ -10,9 +10,8 @@ fi
 
 docker run -ti \
   -v $PARENT/src:/usr/app/src \
-  --env-file $PARENT/.env \
   -p 80:3000 \
- \
-  -e LOG_DIR=/tmp/cash.js \
   -v $PWD/logs/:/tmp/cash.js/ \
+ \
+  --env-file $PARENT/.env \
   ubarbaxor/`basename $PARENT`
