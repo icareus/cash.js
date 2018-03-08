@@ -42,16 +42,16 @@ const constants = {
     // ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
     // 'LTC BTC USDT'.split(' '),
     // 'LTC BTC USDT'.split(' ').reverse(),
-    'LTC BNB USDT'.split(' '),
-    'LTC USDT BNB'.split(' '),
+    'BNB USDT LTC'.split(' '), // Grow BNB
+    'USDT BNB LTC'.split(' '), // Grow USDT
     // 'LTC BNB NEO'.split(' '),
     // 'LTC BNB NEO'.split(' ').reverse(),
     // 'LTC BTC USDT NEO'.split(' '),
     // 'LTC BTC USDT NEO'.split(' ').reverse(),
     // 'LTC BTC NEO USDT'.split(' '),
     // 'LTC BTC NEO USDT'.split(' ').reverse(),
-    'NEO BNB USDT'.split(' '),
-    'NEO USDT BNB'.split(' ')
+    'NEO BNB USDT'.split(' '), // Grow NEO (and make moar GAS)
+    'NEO USDT BNB'.split(' ') // Grow NEO (and make moar GAS)
   ]
 }
 const assets = constants.markets.reduce((assets, symbol) => {
@@ -62,7 +62,7 @@ const assets = constants.markets.reduce((assets, symbol) => {
 }, [])
 console.log(assets)
 
-// // TODO : Make this work ?
+// // TODO : Make this work ? -> Note, generatorics removed from deps.
 // const G = require('generatorics')
 // const paths = []
 // for (let path of G.clone.combination(assets, 3)) {

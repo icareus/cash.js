@@ -9,7 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "nodemonConfig": {
-    "ignore": [ "public/logs/*" ]
+    "ignore": [
+      "public/logs/*"
+    ]
   },
   "author": "ubarbaxor",
   "license": "UNLICENSED",
@@ -17,8 +19,8 @@
     "nodemon": "^1.15.1"
   },
   "dependencies": {
+    "big.js": "^5.0.3",
     "express": "^4.16.2",
-    "generatorics": "^1.1.0",
     "node-binance-api": "^0.4.21",
     "redux": "^3.7.2",
     "serve-index": "^1.9.1",
