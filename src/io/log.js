@@ -5,22 +5,26 @@ const {
   LOG_DIR: dir = '/dev/null'
 } = process.env
 
-// console.log(`LOG_DIR: ${path.resolve(path.join(dir))}`)
-
 const data = []
 
 const put = (...logs) => {
   data.push(...logs)
 }
 
-const hard = (...logs) => {
-  put(logs)
-  const dump = JSON.stringify(logs)
-  const logPath = path.join(dir, `${new Date().toISOString()}.json`)
-  const log = fs.createWriteStream(logPath)
-  log.on('end', _ => console.log(`Wrote to ${logPath}`))
-  log.end(dump)
-}
+// Defer that side effect tyty <3
+const hard = log => new Promise((resolve, reject) => {
+  if (!log || !Object.keys(log).length) {
+    reject(log)
+  } else {
+    const logPath = path.join(dir, `${new Date().toISOString()}.json`)
+    const output = fs.createWriteStream(logPath)
+
+    output.on('end', _ => resolve(log))
+    output.on('error', reject)
+
+    output.end(JSON.stringify(log))
+  }
+})
 
 module.exports = {
   data,

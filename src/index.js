@@ -62,13 +62,13 @@ store.subscribe(_ => {
   console.log(`================== TICK v`)
 
   const state = store.getState()
-  // io.volatile.emit('state', state)
+  io.emit('state', state)
 
   const currentPaths = paths(state)
   console.log(`Paths ------------------------ v`)
   console.log(currentPaths)
   console.log(`------------------------ Paths ^`)
-  io.volatile.emit('paths', currentPaths)
+  io.emit('paths', currentPaths)
   const costFn = require('./util/cost')(currentPaths)
   const leverages = geometries
     .map(path => ({ path, leverage: costFn(path) }))
@@ -83,23 +83,25 @@ store.subscribe(_ => {
   console.log(`Graph ------------------------ v`)
   console.log(JSON.stringify(currentGraph, null, 2))
   console.log(`------------------------ Graph ^`)
-  io.volatile.emit('graph', currentGraph)
+  io.emit('graph', currentGraph)
   const arbiter = require('./util/arbitrage')(currentGraph)
   const arbitrages = geometries
     .map(geom => arbiter(geom))
     .sort((a1, a2) => a1.output > a2.output)
 
   const mindworthy = arbitrages
-    .filter(arb => +arb.output > thresholds.mid)
+    .filter(arb => +arb.output > +thresholds.low)
   console.log(`Arbitrages -------------------- v`)
   console.log(JSON.stringify(mindworthy, null, 2))
   console.log(`-------------------- Arbitrages ^`)
 
-  const costworthy = mindworthy
-    .filter(arb => +arb.output > thresholds.high)
-  if (costworthy.length) {
+  const costworthy = mindworthy.filter(arb => +arb.output > thresholds.mid)
+
+  if (costworthy && costworthy.length) {
     console.log(BELL)
-    log.hard(...costworthy)
+    log.hard(costworthy)
+      .catch(e => console.log(`Couldn't log stuff.`))
+      .then(logged => console.log(`Logged ${logged.length} arbitrages.`))
   }
   io.emit('arbitrages', costworthy)
   console.log(`================== TICK ^`)

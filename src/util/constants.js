@@ -24,9 +24,9 @@ const constants = {
     // 'BTCUSDT'
   ],
   thresholds: {
-    high: 1.005,
-    mid: 1.001,
-    low: 0.999
+    high: 1.01,
+    mid: 1.002,
+    low: 1.001
   },
   // TODO - Generate these better (this is a shame.)
   watch: [

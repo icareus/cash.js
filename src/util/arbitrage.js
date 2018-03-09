@@ -2,6 +2,7 @@ const findPair = require('./findPair')
 const { markets: pairs } = require('./constants')
 // TODO: use this.
 const fixedTo = require('./fixedTo')
+const cost = require('./cost')
 
 // Given a graph, compute cost / return from a run thru values
 const arbitrage = (graph, run, amount = 1) => {
