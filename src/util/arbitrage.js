@@ -1,28 +1,20 @@
-const findPair = require('./findPair')
-const { markets: pairs } = require('./constants')
-// TODO: use this.
-const fixedTo = require('./fixedTo')
-const cost = require('./cost')
+const orderPath = require('./orderPath')
 
-// Given a graph, compute cost / return from a run thru values
-const arbitrage = (graph, run, amount = 1) => {
-  // console.log('arb', run, amount)
+const arbitrage = (market, run, amount = 1) => {
+  const move = orderPath(market)
+
   return run
-  ? run.reduce((arbitrage, sym, i) => {
+  ? run.reduce((total, sym, i) => {
     const nxt = run[i + 1] ? run[i + 1] : run[0]
-    const { output = '1.00000000' } = arbitrage
+    const { output = amount } = total
+    const hop = move(sym, nxt, output)
     return {
-      ...arbitrage,
-      output: fixedTo(output, output * graph[sym][nxt]),
-      [sym]: {
-        pair: findPair(pairs, [sym, nxt]),
-        from: sym,
-        to: nxt,
-        vol: arbitrage.output,
-        ret: fixedTo(output, output * graph[sym][nxt])
-      }
+      ...total,
+      output: hop.ret || 0,
+      orders: [...total.orders, hop]
     }
-  }, { run })
-  : (run, amount) => arbitrage(graph, run, amount)
+  }, { orders: [] })
+  : (run, amount) => arbitrage(market, run, amount)
 }
+
 module.exports = arbitrage

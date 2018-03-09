@@ -5,8 +5,9 @@ const {
 } = require('./io')
 
 const {
-  paths,
-  graph
+//   paths,
+//   graph,
+  simplify
 } = require('./store/selectors')
 const store = require('./store')
 
@@ -59,50 +60,32 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
 
 store.subscribe(_ => {
   console.clear()
-  console.log(`================== TICK v`)
+  // console.log(`================== TICK v`)
 
   const state = store.getState()
-  io.emit('state', state)
 
-  const currentPaths = paths(state)
-  console.log(`Paths ------------------------ v`)
-  console.log(currentPaths)
-  console.log(`------------------------ Paths ^`)
-  io.emit('paths', currentPaths)
-  const costFn = require('./util/cost')(currentPaths)
-  const leverages = geometries
-    .map(path => ({ path, leverage: costFn(path) }))
-    .sort((a1, a2) => a1.leverage > a2.leverage)
-  const logworthy = leverages
-    // .filter(arb => +arb.leverage > thresholds.low)
-  console.log(`leverages -------------------- v`)
-  console.log(JSON.stringify(logworthy, null, 2))
-  console.log(`-------------------- leverages ^`)
-
-  const currentGraph = graph(state)
-  console.log(`Graph ------------------------ v`)
-  console.log(JSON.stringify(currentGraph, null, 2))
-  console.log(`------------------------ Graph ^`)
-  io.emit('graph', currentGraph)
-  const arbiter = require('./util/arbitrage')(currentGraph)
+  const arbiter = require('./util/arbitrage')(state)
   const arbitrages = geometries
     .map(geom => arbiter(geom))
     .sort((a1, a2) => a1.output > a2.output)
 
   const mindworthy = arbitrages
     .filter(arb => +arb.output > +thresholds.low)
-  console.log(`Arbitrages -------------------- v`)
+  // console.log(`Arbitrages -------------------- v`)
   console.log(JSON.stringify(mindworthy, null, 2))
-  console.log(`-------------------- Arbitrages ^`)
+  // console.log(`-------------------- Arbitrages ^`)
 
-  const costworthy = mindworthy.filter(arb => +arb.output > thresholds.mid)
+  const costworthy = mindworthy
+    .filter(arb => +arb.output > thresholds.mid)
 
   if (costworthy && costworthy.length) {
     console.log(BELL)
     log.hard(costworthy)
       .catch(e => console.log(`Couldn't log stuff.`))
       .then(logged => console.log(`Logged ${logged.length} arbitrages.`))
+
+    io.emit('arbitrages', costworthy)
   }
-  io.emit('arbitrages', costworthy)
-  console.log(`================== TICK ^`)
+  io.emit('state', simplify(state))
+  // console.log(`================== TICK ^`)
 })
