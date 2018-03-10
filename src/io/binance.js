@@ -1,3 +1,5 @@
+const util = require('util')
+
 const binance = require('node-binance-api')
 
 const {
@@ -11,6 +13,9 @@ binance.options({
   useServerTime: true, // sync to server time at startup
   test: true // Sandbox mode for development
 })
+
+// binance.buy = util.promisify(binance.buy)
+// binance.sell = util.promisify(binance.sell)
 
 module.exports = binance
 

@@ -23,8 +23,8 @@ const orderPath = market => (from, to, amount = 1) => {
   const { greed } = require('./constants').hyper
   const scratch = spread.times(greed)
   const rate = bail
-    ? B(mkt.ask).minus(scratch)
-    : B(mkt.bid).plus(scratch)
+    ? B(mkt.ask).minus(scratch).toFixed(8)
+    : B(mkt.bid).plus(scratch).toFixed(8)
 
   const path = {
     symbol,

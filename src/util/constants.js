@@ -4,7 +4,7 @@ const constants = {
     ratio: 0.999
   },
   hyper: {
-    greed: 0.9
+    greed: 0.8
   },
   markets: [
     'LTCETH',
@@ -24,9 +24,9 @@ const constants = {
     // 'BTCUSDT'
   ],
   thresholds: {
-    high: 1.01,
-    mid: 1.002,
-    low: 1.001
+    high: 1.05,
+    mid: 1.0015,
+    low: 0.999
   },
   // TODO - Generate these better (this is a shame.)
   watch: [
@@ -42,10 +42,10 @@ const constants = {
     // ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
     // 'LTC BTC USDT'.split(' '),
     // 'LTC BTC USDT'.split(' ').reverse(),
-    'BNB USDT LTC'.split(' '), // Grow BNB
-    'USDT BNB LTC'.split(' '), // Grow USDT
-    // 'LTC BNB NEO'.split(' '),
-    // 'LTC BNB NEO'.split(' ').reverse(),
+    // 'BNB USDT LTC'.split(' '), // Grow BNB
+    // 'USDT BNB LTC'.split(' '), // Grow USDT
+    'LTC BNB NEO'.split(' '),
+    'LTC BNB NEO'.split(' ').reverse(),
     // 'LTC BTC USDT NEO'.split(' '),
     // 'LTC BTC USDT NEO'.split(' ').reverse(),
     // 'LTC BTC NEO USDT'.split(' '),

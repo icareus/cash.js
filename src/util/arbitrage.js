@@ -9,6 +9,7 @@ const arbitrage = (market, run, amount = 1) => {
     const { output = amount } = total
     const hop = move(sym, nxt, output)
     return {
+      run,
       ...total,
       output: hop.ret || 0,
       orders: [...total.orders, hop]
