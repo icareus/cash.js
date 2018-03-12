@@ -4,6 +4,10 @@ const {
   socket: io
 } = require('./io')
 
+// const amount = 0.15 -> NEO
+const amount = 12// -> USDT
+// const amount = 1.5// -> BNB
+
 const {
 //   paths,
 //   graph,
@@ -70,7 +74,6 @@ store.subscribe(_ => {
   const state = store.getState()
 
   const arbiter = require('./util/arbitrage')(state)
-  const amount = 0.15
 
   const arbitrages = geometries
     .map(geom => arbiter(geom, amount))
@@ -80,10 +83,6 @@ store.subscribe(_ => {
   const mindworthy = arbitrages
     .filter(arb => B(arb.output).gt(
       B(thresholds.low).times(amount)))
-
-  // console.log(`Arbitrages -------------------- v`)
-  // console.log(JSON.stringify(mindworthy, null, 2), mindworthy.length)
-  // console.log(`-------------------- Arbitrages ^`)
 
   const costworthy = mindworthy
     .filter(arb => B(arb.output).gt(

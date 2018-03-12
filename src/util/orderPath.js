@@ -17,8 +17,7 @@ const orderPath = market => (from, to, amount = 1) => {
   const vol = B(amount).toFixed(volPrec)
   const priceTick = info[symbol].priceFilter.tickSize
 
-  const buy = (amount, rate) => B(B(amount).div(rate))
-    .add(volTick).times(fee).toFixed(8)
+  const buy = (amount, rate) => B(B(amount).div(rate)).times(fee).toFixed(8)
 
   const mkt = {
     ask: market[symbol].ask,
@@ -28,7 +27,7 @@ const orderPath = market => (from, to, amount = 1) => {
 
   const spread = B(mkt.ask || 0).minus(mkt.bid || 0)
   const { greed } = require('./constants').hyper
-  const scratch = B(Math.floor(spread.div(priceTick).times(greed)))
+  const scratch = B(Math.round(spread.div(priceTick).times(greed)))
     .times(priceTick)
 
   const rate = bail
