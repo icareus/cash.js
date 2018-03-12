@@ -4,75 +4,72 @@ const constants = {
     ratio: 0.999
   },
   hyper: {
-    greed: 0.8
+    greed: 0.42
   },
   markets: [
-    'LTCETH',
-    // 'LTCBTC',
-    // 'ETHBTC',
     'NEOBNB',
-    // 'NEOBTC',
-    'NEOETH',
-    // 'BNBBTC',
-    'BNBETH',
-    'LTCBNB',
-    'LTCUSDT',
-    'NEOUSDT',
-    'ETHUSDT',
-    'BNBUSDT'// ,
-    // 'BCCUSDT',
-    // 'BTCUSDT'
+    'BNBUSDT',
+    'NEOUSDT'
   ],
   thresholds: {
     high: 1.05,
-    mid: 1.0015,
-    low: 0.999
+    mid: 1.001,
+    low: 0.9
   },
-  // TODO - Generate these better (this is a shame.)
+  // TODO - Generate all ?
   watch: [
-    // ['LTC', 'BNB', 'ETH'],
-    // ['LTC', 'BNB', 'ETH'].reverse(),
-    // ['ETH', 'NEO', 'BNB'],
-    // ['ETH', 'NEO', 'BNB'].reverse(),
-    // ['ETH', 'BNB', 'BTC'],
-    // ['ETH', 'BNB', 'BTC'].reverse(),
-    // ['BTC', 'ETH', 'LTC'],
-    // ['BTC', 'ETH', 'LTC'].reverse(),
-    // ['BNB', 'NEO', 'ETH', 'LTC'],
-    // ['BNB', 'NEO', 'ETH', 'LTC'].reverse(),
-    // 'LTC BTC USDT'.split(' '),
-    // 'LTC BTC USDT'.split(' ').reverse(),
-    // 'BNB USDT LTC'.split(' '), // Grow BNB
-    // 'USDT BNB LTC'.split(' '), // Grow USDT
-    'LTC BNB NEO'.split(' '),
-    'LTC BNB NEO'.split(' ').reverse(),
-    // 'LTC BTC USDT NEO'.split(' '),
-    // 'LTC BTC USDT NEO'.split(' ').reverse(),
-    // 'LTC BTC NEO USDT'.split(' '),
-    // 'LTC BTC NEO USDT'.split(' ').reverse(),
-    'NEO BNB USDT'.split(' '), // Grow NEO (and make moar GAS)
-    'NEO USDT BNB'.split(' ') // Grow NEO (and make moar GAS)
-  ]
+    // 'USDT NEO BNB'.split(' '),
+    // 'USDT BNB NEO'.split(' '),
+    'NEO USDT BNB'.split(' '),
+    'NEO BNB USDT'.split(' ')
+    // 'NEO BNB USDT'.split(' '), // Grow NEO (and make moar GAS)
+    // 'NEO USDT BNB'.split(' ') // Grow NEO (and make moar GAS)
+  ],
+  info: { BNBUSDT:
+  { priceFilter:
+  { filterType: 'PRICE_FILTER',
+    minPrice: '0.00010000',
+    maxPrice: '100000.00000000',
+    tickSize: '0.00010000' },
+    lotSize:
+    { filterType: 'LOT_SIZE',
+      minQty: '0.01000000',
+      maxQty: '10000000.00000000',
+      stepSize: '0.01000000' },
+    minNotional: { filterType: 'MIN_NOTIONAL', minNotional: '10.00000000' } },
+    NEOUSDT:
+    { priceFilter:
+    { filterType: 'PRICE_FILTER',
+      minPrice: '0.00100000',
+      maxPrice: '10000000.00000000',
+      tickSize: '0.00100000' },
+      lotSize:
+      { filterType: 'LOT_SIZE',
+        minQty: '0.00100000',
+        maxQty: '10000000.00000000',
+        stepSize: '0.00100000' },
+      minNotional: { filterType: 'MIN_NOTIONAL', minNotional: '10.00000000' } },
+    NEOBNB:
+    { priceFilter:
+    { filterType: 'PRICE_FILTER',
+      minPrice: '0.00100000',
+      maxPrice: '10000000.00000000',
+      tickSize: '0.00100000' },
+      lotSize:
+      { filterType: 'LOT_SIZE',
+        minQty: '0.00100000',
+        maxQty: '10000000.00000000',
+        stepSize: '0.00100000' },
+      minNotional: { filterType: 'MIN_NOTIONAL', minNotional: '1.00000000' } } }
 }
-const assets = constants.markets.reduce((assets, symbol) => {
-  const asset = symbol.slice(0, 3)
-  const currency = symbol.slice(3)
-
-  return assets.concat([asset, currency].filter(x => assets.indexOf(x) === -1))
-}, [])
-console.log(assets)
-
-// // TODO : Make this work ? -> Note, generatorics removed from deps.
-// const G = require('generatorics')
-// const paths = []
-// for (let path of G.clone.combination(assets, 3)) {
-//   paths.push(path)
+// const assets = constants.markets.reduce((assets, symbol) => {
+//   const asset = symbol.slice(0, 3)
+//   const currency = symbol.slice(3)
 //
-//   console.log('PATH HERE ---')
-//   console.log(path)
-//   console.log('END PATH HERE ---')
-// }
-//
-// constants.watch = paths
+//   return assets.concat([asset, currency].filter(x => assets.indexOf(x) === -1))
+// }, [])
+// console.log(assets)
+
+// TODO: Better init & stuff.
 
 module.exports = constants

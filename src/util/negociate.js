@@ -11,9 +11,18 @@ const BELL = '\u0007'
 const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
   new Promise((resolve, reject) => {
     const handler = (ko, ok) => ko ? reject(ko) : resolve(ok)
-
-    binance[action](
-      symbol, `${B(vol).toFixed(8)}`, `${B(rate).toFixed(8)}`, {type: 'LIMIT'},
+    const params = [
+      symbol,
+      `${Number(B(vol))}`,
+      `${Number(B(rate))}`,
+      {type: 'LIMIT'}
+    ]
+    console.log(`Ordering: ${action}`, params)
+    binance[action](...params,
+      // symbol,
+      // `${Number(B(vol))}`,
+      // `${Number(B(rate))}`,
+      // {type: 'LIMIT'},
       handler
     )
   })

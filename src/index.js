@@ -70,10 +70,11 @@ store.subscribe(_ => {
   const state = store.getState()
 
   const arbiter = require('./util/arbitrage')(state)
-  const amount = 0.1
+  const amount = 0.15
 
   const arbitrages = geometries
     .map(geom => arbiter(geom, amount))
+    // Highest lower in console
     .sort((a1, a2) => a1.output > a2.output)
 
   const mindworthy = arbitrages
