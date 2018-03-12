@@ -4,7 +4,7 @@ const constants = {
     ratio: 0.999
   },
   hyper: {
-    greed: 0.65
+    greed: 0.75
   },
   markets: [
     'NEOBNB',
@@ -15,19 +15,15 @@ const constants = {
   ],
   thresholds: {
     high: 1.05,
-    mid: 1.0002,
-    low: 0.9
+    mid: 1.0005,
+    low: 0.95
   },
   // TODO - Generate all ?
   watch: [
     'USDT NEO BNB'.split(' '),
     'USDT BNB NEO'.split(' '),
     'USDT LTC BNB'.split(' '),
-    'USDT BNB LTC'.split(' '),
-    'USDT NEO LTC'.split(' '),
-    'USDT LTC NEO'.split(' ')
-  //   'BNB NEO USDT'.split(' '),
-  //   'BNB USDT NEO'.split(' ')
+    'USDT BNB LTC'.split(' ')
   ],
   info: {
     'BNBUSDT': {

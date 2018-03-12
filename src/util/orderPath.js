@@ -17,7 +17,8 @@ const orderPath = market => (from, to, amount = 1) => {
   const vol = B(amount).toFixed(volPrec)
   const priceTick = info[symbol].priceFilter.tickSize
 
-  const buy = (amount, rate) => B(B(amount).div(rate)).times(fee).toFixed(8)
+  const buy = (amount, rate) => B(B(amount).div(rate).toFixed(volPrec))
+    .times(fee).toFixed(8)
 
   const mkt = {
     ask: market[symbol].ask,
