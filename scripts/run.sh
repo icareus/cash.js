@@ -10,7 +10,7 @@ fi
 docker run -dti \
   -v $PARENT/public:/usr/app/public \
   -v $PARENT/src:/usr/app/src \
-  -p 80:3000 \
+  -p 8080:3000 \
   -v $PWD/logs/:/tmp/cash.js/ \
  \
   --env-file $PARENT/.env \
