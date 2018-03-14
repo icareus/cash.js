@@ -1,6 +1,17 @@
 // const binance = require('./src/io/binance')
 // const { markets } = require('./src/util/constants')
 
+// const subscribeCombined = function(streams, callback, reconnect = false, opened_callback = false)
+// binance.websockets.miniTicker(tick => {console.log(markets.reduce(
+//   (all, symbol) => ({
+//     ...all,
+//     [symbol]: tick[symbol]
+//   })
+//   , {}
+// )
+// )}
+// )
+
 // console.log(markets)
 
 // const upperSnake2LowerCamel = str => str.split('_')
