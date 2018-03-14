@@ -16,7 +16,7 @@ const constants = {
   ],
   thresholds: {
     high: 1.05,
-    mid: 1.0009,
+    mid: 1.00005,
     low: 0.95
   },
   // TODO - Generate all ?

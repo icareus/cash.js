@@ -64,25 +64,26 @@ store.subscribe(_ => {
   const costworthy = mindworthy
     .filter(arb => B(arb.output).gt(B(thresholds.mid).times(amount)))
 
-  if (costworthy.length) {
-    const arbitrage = costworthy[costworthy.length - 1]
-    const key = lock(arbitrage)
+  if (!lock.getActive()) {
+    if (costworthy.length) {
+      const arbitrage = costworthy[costworthy.length - 1]
+      const key = lock(arbitrage)
 
-    if (key) {
-      console.clear()
-      console.log(`Got lock: ${key}`)
+      if (key) {
+        console.clear()
+        console.log(`Got lock: ${key}`)
 
-      negotiate(arbitrage)
-        .then(passThrough(log.hard))
-          .catch(e => console.error(`!!! Logging error /: !!!`))
-        .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
-        .then(watchOrders)
-          .catch(die)
-        .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
-        // .then(lock.unlock(key))
-        // .then(_ => setTimeout(_ => lock.unlock(key), 5000))
-    }// else { console.log(JSON.stringify(costworthy, null, 2)) }
-  } else { console.log(JSON.stringify(mindworthy, null, 2)) }
+        negotiate(arbitrage)
+          .then(passThrough(log.hard))
+            .catch(e => console.error(`!!! Logging error /: !!!`))
+          .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
+          .then(watchOrders)
+          .then(passThrough(_ => lock.unlock(key)))
+            .catch(die)
+          .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
+      }// else { console.log(JSON.stringify(costworthy, null, 2)) }
+    } else { console.log(JSON.stringify(mindworthy, null, 2)) }
+  }//  else { console.log('Lock active.') }
   io.emit('state', simplify(state))
   // console.log(`================== TICK ^`)
 })

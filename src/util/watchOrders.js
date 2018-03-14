@@ -65,7 +65,7 @@ const watchOrders = orders => new Promise((resolve, reject) => {
         let filled = results.filter(order => order.status === 'FILLED')
         if (filled.length === orders.length) {
           clearInterval(i)
-          resolve(i)
+          resolve(orders)
         }
       })
       // .catch(console.error)

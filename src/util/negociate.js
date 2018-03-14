@@ -27,10 +27,8 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
     )
   })
 
-const negociate = arbitrage => {
-  console.log(BELL, JSON.stringify(arbitrage, null, 2))
-  return Promise.all(arbitrage.orders.map(o => order(o)
+const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null, 2)) ||
+  Promise.all(arbitrage.orders.map(o => order(o)
     .catch(e => console.error('Error ordering: ', e.body || e.message))))
-}
 
 module.exports = negociate

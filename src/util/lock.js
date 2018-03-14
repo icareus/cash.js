@@ -18,3 +18,5 @@ module.exports.unlock = k => {
     return ret
   }
 }
+
+module.exports.getActive = _ => active
