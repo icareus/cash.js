@@ -1,4 +1,5 @@
 const binance = require('../io/binance')
+const die = require('./die')
 // const passThrough = require('./passThrough')
 
 // var quantity = 5, price = 0.00402030;
@@ -59,7 +60,7 @@ const watchOrders = orders => new Promise((resolve, reject) => {
   if (require('./constants').test) { orders = testOrders }
 
   const i = setInterval(_ => {
-    Promise.all(orders.map(checkOrder))
+    Promise.all(orders.map(o => checkOrder(o).catch(die)))
       .catch(console.error)
       .then(results => {
         let filled = results.filter(order => order.status === 'FILLED')
