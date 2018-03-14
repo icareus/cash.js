@@ -5,7 +5,7 @@ const constants = {
     ratio: 0.999
   },
   hyper: {
-    greed: 0.6
+    greed: 0.5
   },
   markets: [
     'NEOBNB',
