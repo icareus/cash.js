@@ -5,7 +5,7 @@ const constants = {
     ratio: 0.999
   },
   hyper: {
-    greed: 0.5
+    greed: 0.75
   },
   markets: [
     'NEOBNB',
@@ -16,7 +16,7 @@ const constants = {
   ],
   thresholds: {
     high: 1.05,
-    mid: 1.00005,
+    mid: 1.001,
     low: 0.95
   },
   // TODO - Generate all ?
