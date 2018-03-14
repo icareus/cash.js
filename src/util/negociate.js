@@ -28,7 +28,6 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
   })
 
 const negociate = arbitrage => {
-  global.lock = arbitrage.run.join('->')
   console.log(BELL, JSON.stringify(arbitrage, null, 2))
   return Promise.all(arbitrage.orders.map(o => order(o)
     .catch(e => console.error('Error ordering: ', e.body || e.message))))

@@ -1,3 +1,6 @@
+const lock = require('./util/lock')
+const passThrough = require('./util/passThrough')
+
 const {
   binance,
   log,
@@ -42,68 +45,44 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
   io.emit(action)
 })
 
-// TODO : Watch market also ? (for OHLC graphs)
-// binance.websockets.trades(symbols, (trades) => {
-//   const {
-//     // e:eventType,
-//     E:timestamp,
-//     s:symbol,
-//     p:price,
-//     q:quantity,
-//     m:maker,
-//     a:tradeId
-//   } = trades
-//   const action = {
-//     type: 'update.trade',
-//     timestamp: new Date(timestamp).toISOString(),
-//     trades
-//   }
-//   console.log(symbol, price)
-//   store.dispatch(action)
-// })
-
-// Dirty dirty me...
-// global.lock = false
 const negotiate = require('./util/negociate')
 const die = require('./util/die')
 
 store.subscribe(_ => {
-  if (!global.lock) { console.clear() }
-  // console.log(`================== TICK v`)
-
   const state = store.getState()
 
   const arbiter = require('./util/arbitrage')(state)
+  const watchOrders = require('./util/watchOrders')
 
   const arbitrages = geometries
     .map(geom => arbiter(geom, amount))
-    // Highest lower in console
-    .sort((a1, a2) => a1.output > a2.output)
+    .sort((a1, a2) => a1.output > a2.output)// Highest last
 
   const mindworthy = arbitrages
-    .filter(arb => B(arb.output).gt(
-      B(thresholds.low).times(amount)))
+    .filter(arb => B(arb.output).gt(B(thresholds.low).times(amount)))
 
   const costworthy = mindworthy
-    .filter(arb => B(arb.output).gt(
-      B(thresholds.mid).times(amount)))
+    .filter(arb => B(arb.output).gt(B(thresholds.mid).times(amount)))
 
-  if (costworthy && costworthy.length) {
-    if (!global.lock) {
-      // global.lock = costworthy[costworthy.length - 1]
-      negotiate(costworthy[costworthy.length - 1])
-        .then(die)
-    }
-    log.hard(costworthy)
-      .catch(e => console.log(`Couldn't log stuff.`))
-      .then(logged => console.log(`Logged ${logged.length} arbitrages.`))
+  if (costworthy.length) {
+    const arbitrage = costworthy[costworthy.length - 1]
+    const key = lock(arbitrage)
 
-    io.emit('arbitrages', costworthy)
-  } else if (!global.lock) {
-    console.log(
-      JSON.stringify(mindworthy, null, 2),
-      mindworthy.length)
-  }
+    if (key) {
+      console.clear()
+      console.log(`Got lock: ${key}`)
+
+      negotiate(arbitrage)
+        .then(passThrough(log.hard))
+          .catch(e => console.error(`!!! Logging error /: !!!`))
+        .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
+        .then(watchOrders)
+          .catch(die)
+        .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
+        // .then(lock.unlock(key))
+        // .then(_ => setTimeout(_ => lock.unlock(key), 5000))
+    }// else { console.log(JSON.stringify(costworthy, null, 2)) }
+  } else { console.log(JSON.stringify(mindworthy, null, 2)) }
   io.emit('state', simplify(state))
   // console.log(`================== TICK ^`)
 })

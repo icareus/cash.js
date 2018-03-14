@@ -1,4 +1,4 @@
-// const util = require('util')
+const { test } = require('../util/constants')
 
 const binance = require('node-binance-api')
 
@@ -11,7 +11,7 @@ binance.options({
   APIKEY,
   APISECRET,
   useServerTime: true, // sync to server time at startup
-  test: true // Sandbox mode for development !!!
+  test // Sandbox mode for development !!!
 })
 
 // binance.buy = util.promisify(binance.buy)
