@@ -3,4 +3,7 @@
 node_modules/
 
 public/logs/*.json
+logs/
+exchangeInfo.json
+
 package-lock.json

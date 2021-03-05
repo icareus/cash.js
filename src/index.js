@@ -8,18 +8,16 @@ const {
 } = require('./io')
 
 // const amount = 0.15 -> NEO
-const amount = 12// -> USDT
+const amount = 11// -> USDT
 // const amount = 1.5// -> BNB
 
 const {
-//   paths,
-//   graph,
   simplify
 } = require('./store/selectors')
 const store = require('./store')
 
 const {
-  watch: geometries,
+  watchlist: geometries,
   markets: symbols,
   thresholds
 } = require('./util/constants')
@@ -56,7 +54,7 @@ store.subscribe(_ => {
 
   const arbitrages = geometries
     .map(geom => arbiter(geom, amount))
-    .sort((a1, a2) => a1.output > a2.output)// Highest last
+    .sort((a1, a2) => a1.output - a2.output)// Highest last
 
   const mindworthy = arbitrages
     .filter(arb => B(arb.output).gt(B(thresholds.low).times(amount)))
@@ -82,7 +80,7 @@ store.subscribe(_ => {
             .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
       }// else { console.log(JSON.stringify(costworthy, null, 2)) }
-    } else { console.log(JSON.stringify(mindworthy, null, 2)) }
+    } else { console.log(JSON.stringify(mindworthy[mindworthy.length - 1], null, 2)) }
   }//  else { console.log('Lock active.') }
   io.emit('state', simplify(state))
   // console.log(`================== TICK ^`)

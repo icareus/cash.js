@@ -1,18 +1,19 @@
+// const market = require("../store/dux")
+
 const constants = {
   test: true,
-  fee: {
-    value: 0.1 / 100,
-    ratio: 0.999
-  },
+  fee: 0.1 / 100,
   hyper: {
-    greed: 0.6
+    greed: 0.3
   },
   markets: [
-    'NEOBNB',
     'BNBUSDT',
+    'NEOBNB',
     'NEOUSDT',
     'LTCBNB',
-    'LTCUSDT'
+    'LTCUSDT',
+    'XLMBNB',
+    'XLMUSDT'
   ],
   thresholds: {
     high: 1.05,
@@ -20,106 +21,30 @@ const constants = {
     low: 0.95
   },
   // TODO - Generate all ?
-  watch: [
-    'USDT NEO BNB'.split(' '),
-    'USDT BNB NEO'.split(' '),
-    'USDT LTC BNB'.split(' '),
-    'USDT BNB LTC'.split(' ')
-  ],
-  info: {
-    'BNBUSDT': {
-      'priceFilter': {
-        'filterType': 'PRICE_FILTER',
-        'minPrice': '0.00010000',
-        'maxPrice': '100000.00000000',
-        'tickSize': '0.00010000'
-      },
-      'lotSize': {
-        'filterType': 'LOT_SIZE',
-        'minQty': '0.01000000',
-        'maxQty': '10000000.00000000',
-        'stepSize': '0.01000000'
-      },
-      'minNotional': {
-        'filterType': 'MIN_NOTIONAL',
-        'minNotional': '10.00000000'
-      }
-    },
-    'NEOUSDT': {
-      'priceFilter': {
-        'filterType': 'PRICE_FILTER',
-        'minPrice': '0.00100000',
-        'maxPrice': '10000000.00000000',
-        'tickSize': '0.00100000'
-      },
-      'lotSize': {
-        'filterType': 'LOT_SIZE',
-        'minQty': '0.00100000',
-        'maxQty': '10000000.00000000',
-        'stepSize': '0.00100000'
-      },
-      'minNotional': {
-        'filterType': 'MIN_NOTIONAL',
-        'minNotional': '10.00000000'
-      }
-    },
-    'NEOBNB': {
-      'priceFilter': {
-        'filterType': 'PRICE_FILTER',
-        'minPrice': '0.00100000',
-        'maxPrice': '10000000.00000000',
-        'tickSize': '0.00100000'
-      },
-      'lotSize': {
-        'filterType': 'LOT_SIZE',
-        'minQty': '0.00100000',
-        'maxQty': '10000000.00000000',
-        'stepSize': '0.00100000'
-      },
-      'minNotional': {
-        'filterType': 'MIN_NOTIONAL',
-        'minNotional': '1.00000000'
-      }
-    },
-    'LTCUSDT': {
-      'priceFilter': {
-        'filterType': 'PRICE_FILTER',
-        'minPrice': '0.01000000',
-        'maxPrice': '10000000.00000000',
-        'tickSize': '0.01000000'
-      },
-      'lotSize': {
-        'filterType': 'LOT_SIZE',
-        'minQty': '0.00001000',
-        'maxQty': '10000000.00000000',
-        'stepSize': '0.00001000'
-      },
-      'minNotional': {
-        'filterType': 'MIN_NOTIONAL',
-        'minNotional': '10.00000000'
-      }
-    },
-    'LTCBNB': {
-      'priceFilter': {
-        'filterType': 'PRICE_FILTER',
-        'minPrice': '0.01000000',
-        'maxPrice': '100000.00000000',
-        'tickSize': '0.01000000'
-      },
-      'lotSize': {
-        'filterType': 'LOT_SIZE',
-        'minQty': '0.00001000',
-        'maxQty': '10000000.00000000',
-        'stepSize': '0.00001000'
-      },
-      'minNotional': {
-        'filterType': 'MIN_NOTIONAL',
-        'minNotional': '1.00000000'
-      }
-    }
-  }
-
+  tokens: ['BNB', 'USDT', 'NEO', 'LTC', 'XLM'],
 }
+
+constants.watchlist = constants.tokens.reduce((list, token) => [
+  ...list,
+  ...constants.tokens.filter(tok => tok != token).reduce((acc, tok, _, toks) => [
+    ...acc,
+    ...toks.filter(t => t != tok).map(t => [
+      token,
+      tok,
+      t
+    ])
+  ], [])
+], []).filter(triangle => {
+  let valid = false
+  triangle.forEach((token, index) => {
+    valid = constants.markets.includes(''+token+triangle[(index + 1) % 3])
+      || constants.markets.includes(''+triangle[(index + 1) % 3]+token)
+      ? true
+      : false
+  })
+  return valid
+})
+
 // const assets = constants.markets.reduce((assets, symbol) => {
 //   const asset = symbol.slice(0, 3)
 //   const currency = symbol.slice(3)

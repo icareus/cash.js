@@ -1,0 +1,13 @@
+{
+    "verbose": true,
+    "ignore": ["logs/"],
+    "ext": "js, json, env",
+    "watch": [
+        "./public",
+        "./src",
+        "./.env",
+        "./index.js",
+        "./package.json",
+        "./nodemon.json"
+    ]
+}
