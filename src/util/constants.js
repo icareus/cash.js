@@ -2,9 +2,9 @@
 
 const constants = {
   test: true,
-  fee: 0.1 / 100,
+  fee: 0.075 / 100,
   hyper: {
-    greed: 0.3
+    greed: 0.85
   },
   markets: [
     'BNBUSDT',
@@ -16,9 +16,9 @@ const constants = {
     'XLMUSDT'
   ],
   thresholds: {
-    high: 1.05,
-    mid: 1.00005,
-    low: 0.95
+    high: 1.005,
+    mid: 1.00001,
+    low: 0.975
   },
   // TODO - Generate all ?
   tokens: ['BNB', 'USDT', 'NEO', 'LTC', 'XLM'],
@@ -44,14 +44,6 @@ constants.watchlist = constants.tokens.reduce((list, token) => [
   })
   return valid
 })
-
-// const assets = constants.markets.reduce((assets, symbol) => {
-//   const asset = symbol.slice(0, 3)
-//   const currency = symbol.slice(3)
-//
-//   return assets.concat([asset, currency].filter(x => assets.indexOf(x) === -1))
-// }, [])
-// console.log(assets)
 
 // TODO: Better init & stuff.
 

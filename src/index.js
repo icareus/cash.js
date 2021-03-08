@@ -65,6 +65,7 @@ store.subscribe(_ => {
   if (!lock.getActive()) {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
+      log.hard(arbitrage)
       const key = lock(arbitrage)
 
       if (key) {
@@ -80,7 +81,7 @@ store.subscribe(_ => {
             .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
       }// else { console.log(JSON.stringify(costworthy, null, 2)) }
-    } else { console.log(JSON.stringify(mindworthy[mindworthy.length - 1], null, 2)) }
+    } else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 3), null, 2)) }
   }//  else { console.log('Lock active.') }
   io.emit('state', simplify(state))
   // console.log(`================== TICK ^`)

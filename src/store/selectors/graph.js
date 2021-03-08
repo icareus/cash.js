@@ -1,5 +1,5 @@
 const fixedTo = require('../../util/fixedTo')
-const { ratio: fee } = require('../../util/constants').fee
+const { fee } = 1 - require('../../util/constants')
 const { greed } = require('../../util/constants').hyper
 
 const graph = data => Object.keys(data).reduce(

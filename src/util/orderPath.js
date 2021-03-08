@@ -32,10 +32,7 @@ const orderPath = market => (from, to, amount = 1) => {
   // const spread = B(mkt.ask || 0).minus(mkt.bid || 0)
   const spread = B(mkt.ask).minus(mkt.bid)
 
-  // const scratch = B(Math.round(spread.div(priceTick).times(greed)))
-  //   .times(priceTick)
-
-  const scratch = spread.times(greed).times(priceTick).toFixed(pricePrec)
+  const scratch = B(spread).times(greed).toFixed(pricePrec)
 
   const rate = action == 'buy'
     ? B(mkt.ask).minus(scratch)
@@ -61,16 +58,14 @@ const orderPath = market => (from, to, amount = 1) => {
   const sell = (value) => B(cost).times(value).times(fee).round(volPrec)
 
   const path = {
+    amount,
     from,
     to,
-    amount,
     symbol,
     action,
-    at: rate,
-    // cost: action == 'sell' ? vol : B(B(amount).div(rate).toFixed(volPrec)).div(fee).times(rate),
-    cost,
-    // vol: action == 'sell' ? vol : B(B(amount).div(rate).toFixed(volPrec)),
     vol,
+    at: rate,
+    cost,
     greed,
     spread,
     scratch,
