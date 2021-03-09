@@ -9,7 +9,6 @@ const noport = (port = 3000) => {
   console.log(`No port provided in env. Using ${port}`)
   return port
 }
-const { PORT: port = noport() } = process.env
 
 module.exports = {
   api,
@@ -19,4 +18,8 @@ module.exports = {
   srv
 }
 
-srv.listen(port, console.log(`Web interface up on ${port}`))
+// If NO_WEBUI is set, don't start webserver
+process.env.NO_WEBUI | (_ => {
+  const { PORT: port = noport() } = process.env
+  srv.listen(port, console.log(`Web interface up on ${port}`))
+})

@@ -3,11 +3,11 @@
     "ignore": ["./logs/*.json"],
     "ext": "js, json, env",
     "watch": [
-        "./public",
-        "./src",
-        "./.env",
-        "./index.js",
-        "./package.json",
-        "./nodemon.json"
+        "public",
+        "src",
+        ".env",
+        "index.js",
+        "package.json",
+        "nodemon.json"
     ]
 }

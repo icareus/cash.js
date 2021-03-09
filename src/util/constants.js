@@ -4,7 +4,7 @@ const constants = {
   test: true,
   fee: 0.075 / 100,
   hyper: {
-    greed: 0.85
+    greed: process.env.GREED || 0.1,
   },
   markets: [
     'BNBUSDT',
@@ -17,7 +17,8 @@ const constants = {
   ],
   thresholds: {
     high: 1.005,
-    mid: 1.00001,
+    mid: 1.0001,
+    // mid: 1.0005,
     low: 0.975
   },
   // TODO - Generate all ?
