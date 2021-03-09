@@ -1,5 +1,5 @@
-const redux = require('redux')
+const { combineReducers, createStore } = require('redux')
 
-const market = require('./dux')
+const reducers = require('./dux')
 
-module.exports = redux.createStore(market)
+module.exports = createStore(combineReducers(reducers))

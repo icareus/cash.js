@@ -48,8 +48,9 @@ const die = require('./util/die')
 
 store.subscribe(_ => {
   const state = store.getState()
+  const { market } = state
 
-  const arbiter = require('./util/arbitrage')(state)
+  const arbiter = require('./util/arbitrage')(market)
   const watchOrders = require('./util/watchOrders')
 
   const arbitrages = geometries
