@@ -8,29 +8,29 @@
     <script>
       const socket = io();
       socket.on('arbitrages', arbitrages => {
-        document.querySelector('#arbitrages > p')
-          .innerHTML = `<code>${JSON.stringify(arbitrages, null, 2)}</code>`
+        document.querySelector('#arbitrages > pre')
+          .innerHTML = JSON.stringify(arbitrages, null, 2)
       })
       socket.on('graph', graph => {
-        document.querySelector('#graph > p')
-          .innerHTML = `<code>${JSON.stringify(graph, null, 2)}</code>`
+        document.querySelector('#graph > pre')
+          .innerHTML = JSON.stringify(graph, null, 2)
       })
       socket.on('state', state => {
-        document.querySelector('#state > p')
-        .innerHTML = `<code>${JSON.stringify(state, null, 2)}</code>`
+        document.querySelector('#state > pre')
+        .innerHTML = JSON.stringify(state, null, 2)
       })
     </script>
   </head>
   <body>
     <div class="renderer-wrapper">
       <div id="graph" class="renderer">
-        <p>No data (yet).</p>
+        <pre>No data (yet).</pre>
       </div>
       <div id="arbitrages" class="renderer">
-        <p>No data (yet).</p>
+        <pre>No data (yet).</pre>
       </div>
       <div id="state" class="renderer">
-        <p>No data (yet).</p>
+        <pre>No data (yet).</pre>
       </div>
     </div>
   </body>

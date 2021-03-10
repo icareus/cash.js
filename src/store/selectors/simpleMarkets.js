@@ -1,10 +1,11 @@
 const { fixedTo } = require('../../util')
 
-module.exports = (state = {}) => Object.keys(state).reduce((acc, symbol) => {
-  const { bid, ask, market } = state[symbol]
+module.exports = (state = {}) => Object.keys(state.market || {}).reduce((mkt, symbol) => {
+  const { bid, ask, market } = state.market[symbol]
   const spread = fixedTo(ask, (ask - bid))
+
   return ({
-    ...acc,
+    ...mkt,
     [symbol]: {
       ask,
       bid,

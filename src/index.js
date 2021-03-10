@@ -1,7 +1,9 @@
+console.info('Loading utilities...')
 const lock = require('./util/lock')
 const passThrough = require('./util/passThrough')
 const die = require('./util/die')
 
+console.info('Loading i/o features...')
 const {
   binance,
   log,
@@ -13,10 +15,12 @@ const amount = 11// -> USDT
 // const amount = 1.5// -> BNB
 
 const {
-  simplify
+  simpleMarkets,
+  simpleBalances
 } = require('./store/selectors')
 const store = require('./store')
 
+console.log(`Initiating values...`)
 const {
   watchlist: geometries,
   markets: symbols,
@@ -44,19 +48,34 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
   io.emit(action)
 })
 
-binance.balance((error, balances) => {
-  if ( error ) return die(error)
+const initWallets = _ => {
+  binance.balance((error, balances) => {
+    if ( error ) {
+      console.error(error)
+      initWallets()
+    } else {
+      const action = { type: 'update.balances',
+        balances
+      }
+      store.dispatch(action)
 
-  const action = { type: 'update.balances',
-    balances
-  }
-  console.log(action)
-  // store.dispatch(action)
-
-  binance.websockets.userData(data => {
-    die(JSON.stringify(data, null, 2))
+      binance.websockets.userData(({ B: updatedBalances }) => {
+        const action = { type: 'update.balances',
+          balances: updatedBalances.reduce((balances, balance) => ({
+            ...balances,
+            [balance.a]: {
+              available: balance.f,
+              onOrder: balance.l
+            }
+          }), {})
+        }
+        store.dispatch(action)
+        io.emit(action)
+      })
+    } 
   })
-});
+}
+initWallets()
 
 const negotiate = require('./util/negociate')
 
@@ -85,7 +104,7 @@ store.subscribe(_ => {
 
       if (key) {
         console.clear()
-        console.log(`Got lock: ${key}`)
+        console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage)
           .then(passThrough(log.hard))
@@ -98,5 +117,9 @@ store.subscribe(_ => {
       }
     }// else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 3), null, 2)) }
   }//  else { console.log('Lock active.') }
-  io.emit('state', simplify(state))
+  io.emit('state', {
+    ...state,
+    balances: simpleBalances(state),
+    market: simpleMarkets(state)
+  })
 })

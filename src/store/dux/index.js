@@ -1,5 +1,5 @@
 const market = require('./market')
-const balances = require('./balances')
+const balances =require('./balances')
 
 module.exports = {
   market,

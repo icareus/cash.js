@@ -1,5 +1,6 @@
 module.exports = {
   graph: require('./graph'),
   paths: require('./paths'),
-  simplify: require('./simplify')
+  simpleMarkets: require('./simpleMarkets'),
+  simpleBalances: require('./simpleBalances')
 }

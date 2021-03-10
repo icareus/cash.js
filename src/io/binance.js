@@ -11,6 +11,7 @@ const binance = new Binance().options({
   APIKEY,
   APISECRET,
   useServerTime: true, // sync to server time at startup
+  recvWindow: 60000,
   test // Sandbox mode for development !!!
 })
 

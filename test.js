@@ -6,18 +6,6 @@ const { test } = require('./src/util/constants')
 const binance = require('./src/io/binance')
 const { markets } = require('./src/util/constants')
 
-const {
-   APIKEY,
-   APISECRET
-} = process.env
-  
-binance.options({
-    APIKEY,
-    APISECRET,
-    useServerTime: true, // sync to server time at startup
-    test // Sandbox mode for development !!!
-})
-
 // const subscribeCombined = function(streams, callback, reconnect = false, opened_callback = false)
 // binance.websockets.miniTicker(tick => {console.log(markets.reduce(
 //   (all, symbol) => ({
