@@ -5,7 +5,7 @@ const info = require('../../exchangeInfo.json')
 
 const { greed } = require('./constants').hyper
 
-const orderPath = market => (from, to, amount = 1) => {
+const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
   const action = market[to + from]
     ? 'buy'
     : market[from + to]

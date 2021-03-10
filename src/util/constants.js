@@ -16,7 +16,7 @@ const constants = {
     'XLMUSDT'
   ],
   thresholds: {
-    high: 1.005,
+    high: 1.001,
     mid: 1.0001,
     // mid: 1.0005,
     low: 0.975

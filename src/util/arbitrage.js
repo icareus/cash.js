@@ -1,7 +1,11 @@
 const orderPath = require('./orderPath')
 
-const arbitrage = (market, run, amount = 1) => {
-  const move = orderPath(market)
+const arbitrage = (state, run, amount = 1) => {
+  const {
+    balances,
+    market
+  } = state
+  const move = orderPath(state)
 
   return run
   ? run.reduce((total, sym, i) => {
@@ -15,7 +19,7 @@ const arbitrage = (market, run, amount = 1) => {
       orders: [...total.orders, hop]
     }
   }, { orders: [] })
-  : (run, amount) => arbitrage(market, run, amount)
+  : (run, amount) => arbitrage(state, run, amount)
 }
 
 module.exports = arbitrage

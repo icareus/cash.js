@@ -81,9 +81,8 @@ const negotiate = require('./util/negociate')
 
 store.subscribe(_ => {
   const state = store.getState()
-  const { market } = state
 
-  const arbiter = require('./util/arbitrage')(market)
+  const arbiter = require('./util/arbitrage')(state)
   const watchOrders = require('./util/watchOrders')
 
   const arbitrages = geometries
