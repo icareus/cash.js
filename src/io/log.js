@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const die = require('../util/die')
+// const die = require('../util/die')
 
 const {
   LOG_DIR: dir = '/dev/null'

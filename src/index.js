@@ -77,7 +77,7 @@ const initWallets = _ => {
 }
 initWallets()
 
-const negotiate = require('./util/negociate')
+const negotiate = require('./util/negotiate')
 
 store.subscribe(_ => {
   const state = store.getState()
@@ -114,7 +114,7 @@ store.subscribe(_ => {
             .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
       }
-    } else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 3), null, 2)) }
+    } else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 1), null, 2)) }
   }//  else { console.log('Lock active.') }
   io.emit('state', {
     ...state,
