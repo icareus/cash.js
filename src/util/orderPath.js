@@ -54,11 +54,12 @@ const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
 
 // const buy = (amount, rate) => B(B(amount).div(rate).toFixed(volPrec))
 // .times(fee).toFixed(8)
-  const buy = (price) => B(cost).div(price).times(fee).round(volPrec)
-  const sell = (value) => B(cost).times(value).times(fee).round(volPrec)
+  const buy = (price) => B(cost).div(price).times(fee).round(pricePrec)
+  const sell = (value) => B(cost).times(value).times(fee).round(pricePrec)
 
   const path = {
     amount,
+    available: balances[from].available,
     from,
     to,
     symbol,
