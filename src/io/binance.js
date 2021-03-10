@@ -1,13 +1,13 @@
 const { test } = require('../util/constants')
 
-const binance = require('node-binance-api')
+const Binance = require('node-binance-api')
 
 const {
   APIKEY,
   APISECRET
 } = process.env
 
-binance.options({
+const binance = new Binance().options({
   APIKEY,
   APISECRET,
   useServerTime: true, // sync to server time at startup

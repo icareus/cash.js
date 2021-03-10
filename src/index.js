@@ -1,5 +1,6 @@
 const lock = require('./util/lock')
 const passThrough = require('./util/passThrough')
+const die = require('./util/die')
 
 const {
   binance,
@@ -43,8 +44,21 @@ binance.websockets.depthCache(symbols, (symbol, depth) => {
   io.emit(action)
 })
 
+binance.balance((error, balances) => {
+  if ( error ) return die(error)
+
+  const action = { type: 'update.balances',
+    balances
+  }
+  console.log(action)
+  // store.dispatch(action)
+
+  binance.websockets.userData(data => {
+    die(JSON.stringify(data, null, 2))
+  })
+});
+
 const negotiate = require('./util/negociate')
-const die = require('./util/die')
 
 store.subscribe(_ => {
   const state = store.getState()
@@ -81,9 +95,8 @@ store.subscribe(_ => {
           .then(passThrough(_ => lock.unlock(key)))
             .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
-      }// else { console.log(JSON.stringify(costworthy, null, 2)) }
-    } else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 3), null, 2)) }
+      }
+    }// else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 3), null, 2)) }
   }//  else { console.log('Lock active.') }
   io.emit('state', simplify(state))
-  // console.log(`================== TICK ^`)
 })

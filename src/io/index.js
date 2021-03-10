@@ -19,7 +19,7 @@ module.exports = {
 }
 
 // If NO_WEBUI is set, don't start webserver
-process.env.NO_WEBUI | (_ => {
+process.env.NO_WEBUI || (_ => {
   const { PORT: port = noport() } = process.env
   srv.listen(port, console.log(`Web interface up on ${port}`))
 })
