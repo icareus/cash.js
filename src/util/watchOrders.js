@@ -9,42 +9,43 @@ const binance = require('../io/binance')
 // binance.orderStatus("ETHBTC", orderid, (error, orderStatus, symbol) => {
 //   console.log(symbol+" order status:", orderStatus);
 // });
-const testOrders = [
-  { symbol: 'NEOUSDT',
-    orderId: 19314878,
-    clientOrderId: 'CloUbD3xcnR23loZArDVy1',
-    transactTime: 1520957745654,
-    price: '80.92800000',
-    origQty: '0.14800000',
-    executedQty: '0.00000000',
-    status: 'NEW',
-    timeInForce: 'GTC',
-    type: 'LIMIT',
-    side: 'BUY' },
-  { symbol: 'NEOBNB',
-    orderId: 7442423,
-    clientOrderId: '2vMP2L9ZGwsccrtsic4eRR',
-    transactTime: 1520957745647,
-    price: '8.46900000',
-    origQty: '0.14700000',
-    executedQty: '0.00000000',
-    status: 'NEW',
-    timeInForce: 'GTC',
-    type: 'LIMIT',
-    side: 'SELL' },
-  { symbol: 'BNBUSDT',
-    orderId: 15385841,
-    clientOrderId: 'yjj4t8DVQtoZ3dR2bBJ05F',
-    transactTime: 1520957745647,
-    price: '9.65080000',
-    origQty: '1.25000000',
-    executedQty: '0.00000000',
-    status: 'NEW',
-    timeInForce: 'GTC',
-    type: 'LIMIT',
-    side: 'SELL' } ]
+// const testOrders = [
+//   { symbol: 'NEOUSDT',
+//     orderId: 19314878,
+//     clientOrderId: 'CloUbD3xcnR23loZArDVy1',
+//     transactTime: 1520957745654,
+//     price: '80.92800000',
+//     origQty: '0.14800000',
+//     executedQty: '0.00000000',
+//     status: 'NEW',
+//     timeInForce: 'GTC',
+//     type: 'LIMIT',
+//     side: 'BUY' },
+//   { symbol: 'NEOBNB',
+//     orderId: 7442423,
+//     clientOrderId: '2vMP2L9ZGwsccrtsic4eRR',
+//     transactTime: 1520957745647,
+//     price: '8.46900000',
+//     origQty: '0.14700000',
+//     executedQty: '0.00000000',
+//     status: 'NEW',
+//     timeInForce: 'GTC',
+//     type: 'LIMIT',
+//     side: 'SELL' },
+//   { symbol: 'BNBUSDT',
+//     orderId: 15385841,
+//     clientOrderId: 'yjj4t8DVQtoZ3dR2bBJ05F',
+//     transactTime: 1520957745647,
+//     price: '9.65080000',
+//     origQty: '1.25000000',
+//     executedQty: '0.00000000',
+//     status: 'NEW',
+//     timeInForce: 'GTC',
+//     type: 'LIMIT',
+//     side: 'SELL' } ]
 
 const checkOrder = order => new Promise((resolve, reject) => {
+  if (!order) { resolve({}) }
   const {
     orderId,
     symbol
@@ -56,14 +57,15 @@ const checkOrder = order => new Promise((resolve, reject) => {
 })
 
 const watchOrders = orders => new Promise((resolve, reject) => {
-  if (require('./constants').test) { orders = testOrders }
-
   const i = setInterval(_ => {
-    Promise.all(orders.map(checkOrder))
+    console.log(orders)
+    Promise.all(orders.filter(o => o).map(checkOrder))
       .catch(console.error)
       .then(results => {
-        let filled = results.filter(order => order.status === 'FILLED')
-        if (filled.length === orders.length) {
+        const filled = results.filter(order => order.status === 'FILLED')
+        const expired = results.filter(order => order.status === 'EXPIRED')
+        const canceled = results.filter(order => order.status === 'CANCELED')
+        if (filled.length + expired.length + canceled.length === orders.length) {
           clearInterval(i)
           resolve(orders)
         }

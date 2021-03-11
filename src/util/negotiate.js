@@ -11,12 +11,17 @@ const BELL = '\u0007'
 
 const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
   new Promise((resolve, reject) => {
-    const handler = (ko, ok) => ko ? reject(ko) : resolve(ok)
+    const handler = (ko, ok) => {
+      if (ko) { reject(ko) } else { resolve(ok) }
+    }
     const params = [
       symbol,
       `${Number(B(vol))}`,
       `${Number(B(rate))}`,
-      {type: 'LIMIT'}
+      {
+        type: 'LIMIT',
+        // timeInForce: 'FOK'
+      }
     ]
     console.log(`Ordering: ${action}`, {
       symbol,
@@ -28,15 +33,20 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
       // `${Number(B(vol))}`,
       // `${Number(B(rate))}`,
       // {type: 'LIMIT'},
-      handler, handler
+      handler
     )
-  }).catch(e => die(`Order error: ${e}`))
+  }).catch(e => console.error(`Order error: ${e.body}`))
 
 const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null, 2)) ||
   Promise.all(arbitrage.orders
     .map(o => order(o).catch(e => console.error('Error ordering: ', e.body || e.message)))
   ).catch(e => die(`CAUGHT ! ${e.message}`))
-  .then(console.warn)
+  .then(nego => {
+    console.warn('Negociated:', nego)
+    return nego
+  }).catch(e => {
+    console.error('Negociation error.', e.body.msg || e.body || e)
+  })
 
 
 module.exports = negociate

@@ -1,27 +1,29 @@
-// const market = require("../store/dux")
+const markets = Object.keys(require('../../exchangeInfo.json'))
 
 const constants = {
-  test: true,
   fee: 0.075 / 100,
   hyper: {
     greed: process.env.GREED || 0.1,
   },
-  markets: [
-    'BNBUSDT',
-    'NEOBNB',
-    'NEOUSDT',
-    'LTCBNB',
-    'LTCUSDT',
-    'XLMBNB',
-    'XLMUSDT'
-  ],
+  markets,
   thresholds: {
     high: 1.001,
     mid: 1.0001,
     low: 0.975
   },
   // TODO - Generate all ?
-  tokens: ['BNB', 'USDT', 'NEO', 'LTC', 'XLM'],
+  tokens: [
+    'BNB',
+    'BTC',
+    'BUSD',
+    'ETH',
+    'LTC',
+    'TRX',
+    'USDT',
+    'NEO',
+    'XLM',
+    'XRP'
+  ],
 }
 
 constants.watchlist = constants.tokens.reduce((list, token) => [

@@ -1,24 +1,31 @@
-const { test } = require('../util/constants')
-
 const Binance = require('node-binance-api')
 
 const {
   APIKEY,
-  APISECRET
+  APISECRET,
+  testKey,
+  testSecret,
+  test
 } = process.env
 
-const binance = new Binance().options({
+const opts = {
   APIKEY,
   APISECRET,
-  useServerTime: true, // sync to server time at startup
+  // useServerTime: true, // sync to server time at startup
   recvWindow: 60000,
-  test // Sandbox mode for development !!!
-})
+  // test // Sandbox mode for development !!!
+}
 
-// binance.buy = util.promisify(binance.buy)
-// binance.sell = util.promisify(binance.sell)
+if (test) {
+  opts.urls = {
+    base: 'https://testnet.binance.vision/api/',
+    combineStream: 'wss://testnet.binance.vision/stream?streams=',
+    stream: 'wss://testnet.binance.vision/ws/'
+  },
+  opts.APIKEY = testKey,
+  opts.APISECRET = testSecret
+}
+
+const binance = new Binance().options(opts)
 
 module.exports = binance
-
-// onBalances = balances => Object.keys(balances).reduce((assets, ast) => { const asset = balances[ast] ; return (+asset.available || +asset.onOrder ? {...assets, [ast]: asset} : assets)}, {})
-// B.balance((_, balances) => console.log(onBalances(balances)))

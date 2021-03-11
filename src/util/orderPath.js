@@ -4,6 +4,7 @@ const fee = 1 - require('./constants').fee
 const info = require('../../exchangeInfo.json')
 
 const { greed } = require('./constants').hyper
+const die = require('./die')
 
 const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
   const action = market[to + from]
@@ -32,11 +33,18 @@ const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
   // const spread = B(mkt.ask || 0).minus(mkt.bid || 0)
   const spread = B(mkt.ask).minus(mkt.bid)
 
-  const scratch = B(spread).times(greed).toFixed(pricePrec)
+  let scratch = B(spread).times(greed).toFixed(pricePrec)
+  if (B(scratch).gt(mkt.ask)) {
+    scratch = mkt.ask
+  }
+  if (B(scratch).abs().gt(mkt.bid)) {
+    scratch = B(mkt.bid).times(-1)
+  }
 
-  const rate = action == 'buy'
+  let rate = action == 'buy'
     ? B(mkt.ask).minus(scratch)
     : B(mkt.bid).plus(scratch)
+  if (!Number(rate)) { return {} }
 
 // action == 'sell'
 //  ? vol : B(B(amount).div(rate).toFixed(volPrec)).div(fee).times(rate)
@@ -75,7 +83,9 @@ const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
     mkt,
     ret: action == 'buy' ? buy(rate) : sell(rate)
   }
-  return path
+  return B(path.ret).gt(B(info[symbol].minNotional.minNotional))
+    ? path
+    : {}
 }
 
 module.exports = orderPath
