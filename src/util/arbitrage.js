@@ -59,7 +59,7 @@ const arbitrage = (state, run, amount) => {
   if (overRatio.ratio === null) {
     return moves
   } else {
-    return (arbitrage(state, run, amount * overRatio.ratio))
+    return (arbitrage(state, run, amount * overRatio.ratio * 0.9))
   } 
 }
 
