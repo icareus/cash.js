@@ -2,9 +2,9 @@ require('dotenv').config()
 
 const fs = require('fs').promises
 
-const { test } = require('./src/util/constants')
+// const { test } = require('./src/util/constants')
 const binance = require('./src/io/binance')
-const { markets } = require('./src/util/constants')
+// const { markets } = require('./src/util/constants')
 
 // const subscribeCombined = function(streams, callback, reconnect = false, opened_callback = false)
 // binance.websockets.miniTicker(tick => {console.log(markets.reduce(
@@ -29,16 +29,15 @@ const exchangeInfo = new Promise((resolve, reject) =>
   binance.exchangeInfo((e, infos) => e
     ? reject(e)
     : resolve(infos.symbols
-    .reduce((info, symbolInfo) => // console.log(symbolInfo) ||
-    markets.includes(symbolInfo.symbol)
-      ? { ...info,
+      .reduce((info, symbolInfo) => ({
+        ...info,
         [symbolInfo.symbol]: symbolInfo.filters
-        .reduce((filters, fltr) => ({
-          ...filters,
-          [upperSnake2LowerCamel(fltr.filterType)]: fltr
-        }), {})}
-      : info,
-    {}))
+          .reduce((filters, fltr) => ({
+            ...filters,
+            [upperSnake2LowerCamel(fltr.filterType)]: fltr
+          }), {})
+      }), {})
+    )
   )
 )
 

@@ -11,7 +11,7 @@ const {
 } = require('./io')
 
 // const amount = 0.15 -> NEO
-const amount = 11// -> USDT
+// const amount = 11// -> USDT
 // const amount = 1.5// -> BNB
 
 const {
@@ -20,7 +20,7 @@ const {
 } = require('./store/selectors')
 const store = require('./store')
 
-console.log(`Initiating values...`)
+console.log(`Initializing values...`)
 const {
   watchlist: geometries,
   markets: symbols,
@@ -86,14 +86,14 @@ store.subscribe(_ => {
   const watchOrders = require('./util/watchOrders')
 
   const arbitrages = geometries
-    .map(geom => arbiter(geom, amount))
-    .sort((a1, a2) => a1.output - a2.output)// Highest last
+    .map(geom => arbiter(geom, state.balances[geom[0]].available))
+    .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
 
   const mindworthy = arbitrages
-    .filter(arb => B(arb.output).gt(B(thresholds.low).times(amount)))
+    .filter(arb => B(arb.ratio).gt(B(thresholds.low)))
 
   const costworthy = mindworthy
-    .filter(arb => B(arb.output).gt(B(thresholds.mid).times(amount)))
+    .filter(arb => B(arb.ratio).gt(B(thresholds.mid)))
 
   if (!lock.getActive()) {
     if (costworthy.length) {
@@ -114,7 +114,11 @@ store.subscribe(_ => {
             .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
       }
-    } else { console.log(JSON.stringify(mindworthy.slice(mindworthy.length - 1), null, 2)) }
+    } else {
+      const best = mindworthy[mindworthy.length - 1]
+      io.emit('graph', best)
+      // console.log(JSON.stringify(best, null, 2))
+    }
   }//  else { console.log('Lock active.') }
   io.emit('state', {
     ...state,

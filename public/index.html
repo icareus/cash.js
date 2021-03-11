@@ -12,8 +12,26 @@
           .innerHTML = JSON.stringify(arbitrages, null, 2)
       })
       socket.on('graph', graph => {
+        const data = {
+          path: graph.run,
+          hops: graph.orders.reduce((hops, { from, to, action, symbol, vol, ret }) => ([
+            ...hops,
+            {
+              from,
+              to,
+              symbol,
+              action,
+              vol,
+              ret
+            }
+          ]), []),
+          input: Math.round(graph.orders[0].amount * 1000000) / 1000000,
+          output: graph.output,
+          profit: Math.round(graph.profit * 10000) / 10000,
+          ratio: Math.round(graph.ratio * 1000) / 1000
+        }
         document.querySelector('#graph > pre')
-          .innerHTML = JSON.stringify(graph, null, 2)
+          .innerHTML = JSON.stringify(data, null, 2)
       })
       socket.on('state', state => {
         document.querySelector('#state > pre')
@@ -24,12 +42,15 @@
   <body>
     <div class="renderer-wrapper">
       <div id="state" class="renderer">
+        State:
         <pre>No data (yet).</pre>
       </div>
       <div id="graph" class="renderer">
+        Most profitable graph:
         <pre>No data (yet).</pre>
       </div>
       <div id="arbitrages" class="renderer">
+        Arbitrages:
         <pre>No data (yet).</pre>
       </div>
     </div>

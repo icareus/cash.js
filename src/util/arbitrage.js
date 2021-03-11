@@ -1,10 +1,13 @@
 const orderPath = require('./orderPath')
 
-const arbitrage = (state, run, amount = 1) => {
+const arbitrage = (state, run, amount) => {
   const {
     balances,
     // market
   } = state
+  if (run && !amount && amount !== 0) {
+    amount = Number(balances[run[0]].available) / 4
+  }
   const move = orderPath(state)
 
   if (!run)
@@ -18,7 +21,9 @@ const arbitrage = (state, run, amount = 1) => {
       run,
       ...total,
       output: hop.ret || 0,
-      orders: [...total.orders, hop]
+      orders: [...total.orders, hop],
+      profit: Number(hop.ret || 0) - amount,
+      ratio: Number(hop.ret || 0) / amount
     }
   }, { orders: [] })
 
