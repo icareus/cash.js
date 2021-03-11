@@ -34,7 +34,7 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
 
 const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null, 2)) ||
   Promise.all(arbitrage.orders
-    .map(o => order(o).catch(e => console.error('Error rdering: ', e.body || e.message)))
+    .map(o => order(o).catch(e => console.error('Error ordering: ', e.body || e.message)))
   ).catch(e => die(`CAUGHT ! ${e.message}`))
   .then(console.warn)
 

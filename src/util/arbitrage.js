@@ -22,8 +22,8 @@ const arbitrage = (state, run, amount) => {
       ...total,
       output: hop.ret || 0,
       orders: [...total.orders, hop],
-      profit: Number(hop.ret || 0) - amount,
-      ratio: Number(hop.ret || 0) / amount
+      profit: Number(hop.ret || 0) - (total.orders.length ? total.orders[0].cost : hop.cost),
+      ratio: Number(hop.ret || 0) / (total.orders.length ? (total.orders[0].cost || Infinity) : Infinity)
     }
   }, { orders: [] })
 
