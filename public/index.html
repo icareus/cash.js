@@ -5,11 +5,14 @@
     <title>cash.js</title>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/main.css">
+    <audio id="tuturu" autoplay></audio>
     <script>
       const socket = io();
       socket.on('arbitrage', arbitrage => {
         document.querySelector('#arbitrages > pre')
-          .innerHTML = JSON.stringify(arbitrages, null, 2)
+          .innerHTML = JSON.stringify(arbitrage, null, 2)
+        document.getElementById('tuturu')
+          .src = 'https://www.myinstants.com/media/sounds/tuturu_1.mp3'
       })
       socket.on('graph', graph => {
         const data = {

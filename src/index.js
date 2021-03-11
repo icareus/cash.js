@@ -93,7 +93,6 @@ store.subscribe(_ => {
   const state = store.getState()
 
   if (!graph.geometries) {
-    console.warn(`Graph not ready`, graph)
     if (graph.ready) {
       console.warn('Building graph...')
       graph = require('./store/selectors/graph')(state)
@@ -163,7 +162,10 @@ store.subscribe(_ => {
         console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage)
-          .then(passThrough(log.hard))
+          .then(_ => {
+            io.emit('arbitrage', arbitrage)
+            return _
+          }).then(passThrough(log.hard))
             .catch(e => console.error(`!!! Logging error /: !!!`))
           .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
           .then(watchOrders)
@@ -181,7 +183,6 @@ store.subscribe(_ => {
     }
   }//  else { console.log('Lock active.') }
   io.emit('state', {
-    ...state,
     balances: simpleBalances(state),
     market: simpleMarkets(state)
   })
