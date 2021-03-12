@@ -14,7 +14,6 @@
 
       socket.on('state', state => {
         const renderer = document.querySelector('#state > pre')
-        let oldState = JSON.parse(renderer.innerHTML)
         renderer.innerHTML = JSON.stringify(state, null, 2)
         if (!profits) {
           profits = Object.keys(state.balances).reduce((profits, tokens) => ({
@@ -22,6 +21,8 @@
             [token]: 0
           }), {})
         } else {
+          const oldState = JSON.parse(renderer.innerHTML)
+
           for(token in profits) {
             profits[token] = profits[token] + (state.balances[token] - oldState.balances[token])
             state.needs_profits_refresh = true
