@@ -10,9 +10,27 @@
       const socket = io()
       const arbitrages = {}
 
+      let profits
+
       socket.on('state', state => {
-        document.querySelector('#state > pre')
-        .innerHTML = JSON.stringify(state, null, 2)
+        const renderer = document.querySelector('#state > pre')
+        let oldState = JSON.parse(renderer.innerHTML)
+        renderer.innerHTML = JSON.stringify(state, null, 2)
+        if (!profits) {
+          profits = Object.keys(state.balances).reduce((profits, tokens) => ({
+            ...profits,
+            [token]: 0
+          }), {})
+        } else {
+          for(token in profits) {
+            profits[token] = profits[token] + (state.balances[token] - oldState.balances[token])
+            state.needs_profits_refresh = true
+          }
+          if (state.needs_profits_refresh) {
+            document.querySelector('#profits > pre')
+              .innerHTML = JSON.stringify(profits, null, 2)
+          }
+        }
       })
 
       socket.on('graph', graph => {
@@ -70,6 +88,12 @@
     </script>
   </head>
   <body>
+    <div class="renderer-wrapper">
+      <div id="profits" class="renderer">
+        Profits since page load:
+        <pre>No data (yet).</pre>
+      </div>
+    </div>
     <div class="renderer-wrapper">
       <div id="state" class="renderer">
         State:
