@@ -45,7 +45,7 @@ const binance = require('../io/binance')
 //     side: 'SELL' } ]
 
 const checkOrder = order => new Promise((resolve, reject) => {
-  if (!order) { resolve({}) }
+  // if (!order) { resolve({}) }
   const {
     orderId,
     symbol

@@ -1,3 +1,4 @@
+const B = require('./B')
 const orderPath = require('./orderPath')
 
 const arbitrage = (state, run, amount) => {
@@ -22,8 +23,10 @@ const arbitrage = (state, run, amount) => {
       ...total,
       output: hop.ret || 0,
       orders: [...total.orders, hop],
-      profit: Number(hop.ret || 0) - (total.orders.length ? total.orders[0].cost : hop.cost),
-      ratio: Number(hop.ret || 0) / (total.orders.length ? (total.orders[0].cost || Infinity) : Infinity)
+      profit: total.orders.length && total.orders[0].cost
+        && B(hop.ret || 0).minus(total.orders[0].cost),
+      ratio: total.orders.length && total.orders[0].cost
+        && B(hop.ret || 0).div(total.orders[0].cost)
     }
   }, { orders: [] })
 

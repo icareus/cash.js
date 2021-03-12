@@ -26,7 +26,7 @@
         }), {}), null, 2)
       })
       socket.on('graph', graph => {
-        const data = {
+        const data = {// ...graph }
           path: graph.run,
           hops: graph.orders.reduce((hops, { from, to, action, symbol, vol, ret }) => ([
             ...hops,
@@ -39,10 +39,10 @@
               ret
             }
           ]), []),
-          input: Math.round(graph.orders[0].amount * 1000000) / 1000000,
+          input: graph.orders[0].cost,
           output: graph.output,
-          profit: Math.round(graph.profit * 10000) / 10000,
-          ratio: Math.round(graph.ratio * 1000) / 1000
+          profit: graph.profit,
+          ratio: graph.ratio
         }
         document.querySelector('#graph > pre')
           .innerHTML = JSON.stringify(data, null, 2)
