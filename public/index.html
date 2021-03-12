@@ -7,17 +7,23 @@
     <link rel="stylesheet" href="/main.css">
     <audio id="tuturu" autoplay></audio>
     <script>
-      window.arbitrages = []
-      const socket = io();
-      socket.on('arbitrage', arbitrage => {
-        arbitrages = [
-          ...arbitrages,
-          arbitrage
-        ]
-        document.querySelector('#arbitrages > pre')
-          .innerHTML = JSON.stringify(arbitrages, null, 2)
-        document.getElementById('tuturu')
-          .src = 'https://www.myinstants.com/media/sounds/tuturu_1.mp3'
+      const socket = io()
+
+      const arbitrages = {}
+      socket.on('arbitrages', update => {
+        const elem = document.querySelector('#arbitrages > pre')
+        for (timestamp in update) {
+          const time = Number(timestamp)
+          if (!arbitrages[time]) {
+            arbitrages[time] = update[timestamp]
+          document.getElementById('tuturu')
+            .src = 'https://www.myinstants.com/media/sounds/tuturu_1.mp3'
+          }
+        }
+        elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
+          ...json,
+          [new Date(Number(time)).toLocaleString()]: arbitrages[time]
+        }), {}), null, 2)
       })
       socket.on('graph', graph => {
         const data = {

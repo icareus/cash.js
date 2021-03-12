@@ -1,22 +1,17 @@
-// const util = require('util')
-let active = null
-let key = null
+let active = {}
 
 module.exports = what => {
-  if (!active) {
-    active = what || true
-    key = `${new Date().toISOString()}`
+  key = `${new Date().getTime()}`
+    active[key] = what || true
     return key
-  }
 }
 
-module.exports.unlock = k => {
-  if (k === key) {
+module.exports.unlock = key => {
+  if (active.key) {
     let ret = active
-    active = null
-    key = null
+    delete(active.key)
     return ret
   }
 }
 
-module.exports.getActive = _ => active
+module.exports.getActive = _ => Object.keys(active).length && active

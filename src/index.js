@@ -125,24 +125,23 @@ store.subscribe(_ => {
       })
     } else { return }
   }
-  // if (!Array.isArray(graph)) {
-  //   if (graph.ready !== true) {
-  //     console.warn('Graph not ready', graph)
-  //   } else {
-  //     console.log('Computing graph...')
-  //     graph = require('./store/selectors/graph')(store.getState())
-
-  //     console.log('Done.')
-  //   }
-  //   return
-  // }
 
   const arbiter = require('./util/arbitrage')(state)
   const watchOrders = require('./util/watchOrders')
 
   const arbitrages = graph.geometries
-    .map(geometry => arbiter(geometry, state.balances[geometry[0]].available))
+    .map(geometry => {
+      // console.log(geometry.map(token => ({ token, balance: state.balances[token].available })), arbiter(geometry, state.balances[geometry[0]].available))
+      return arbiter(geometry, state.balances[geometry[0]].available)
+    })
+    .filter(a => a.ratio)
     .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
+  
+  if (arbitrages.length) {
+    io.emit('graph', arbitrages[arbitrages.length - 1])
+  } else {
+    // Complain about something ?
+  }
 
   const mindworthy = arbitrages
     .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.low)) : null)
@@ -154,7 +153,7 @@ store.subscribe(_ => {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
       log.hard(arbitrage)
-      io.emit('graph', arbitrage)
+      // io.emit('graph', arbitrage)
       const key = lock(arbitrage)
 
       if (key) {
@@ -162,26 +161,18 @@ store.subscribe(_ => {
         console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage)
-          .then(_ => {
-            io.emit('arbitrage', arbitrage)
-            return _
-          }).then(passThrough(log.hard))
-            .catch(e => console.error(`!!! Logging error /: !!!`))
+          .then(passThrough(log.hard)).catch(console.error)
           .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
-          .then(watchOrders)
+          .then(watchOrders).catch(die)
           .then(passThrough(_ => lock.unlock(key)))
-            .catch(die)
           .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
       }
     } else if (mindworthy.length) {
-      const best = mindworthy[mindworthy.length - 1]
-      io.emit('graph', best)
-      // console.log(JSON.stringify(best, null, 2))
-    } else {
-      const best = arbitrages[arbitrages.length - 1]
-      io.emit('graph', best)
-    }
-  }//  else { console.log('Lock active.') }
+      // io.emit('graph', mindworthy[mindworthy.length - 1])
+    }// else { io.emit('graph', arbitrages[arbitrages.length - 1]) }
+  } else {
+    io.emit('arbitrages', lock.getActive())
+  }
   io.emit('state', {
     balances: simpleBalances(state),
     market: simpleMarkets(state)
