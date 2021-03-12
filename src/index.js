@@ -170,7 +170,7 @@ store.subscribe(_ => {
           .then(passThrough(_ => lock.unlock(key)))
           .then(passThrough(r => {
             console.log(JSON.stringify(r, null, 2), 'Resolved.')
-            io.emit('resolved', key)
+            io.emit('resolve', { ...arbitrage, time: key })
           }))
       }
     } else if (mindworthy.length) {

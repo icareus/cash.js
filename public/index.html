@@ -8,23 +8,13 @@
     <audio id="tuturu" autoplay></audio>
     <script>
       const socket = io()
-
       const arbitrages = {}
-      socket.on('arbitrages', update => {
-        const elem = document.querySelector('#arbitrages > pre')
-        for (timestamp in update) {
-          const time = Number(timestamp)
-          if (!arbitrages[time]) {
-            arbitrages[time] = update[timestamp]
-          document.getElementById('tuturu')
-            .src = 'https://www.myinstants.com/media/sounds/tuturu_1.mp3'
-          }
-        }
-        elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
-          ...json,
-          [new Date(Number(time)).toLocaleString()]: arbitrages[time]
-        }), {}), null, 2)
+
+      socket.on('state', state => {
+        document.querySelector('#state > pre')
+        .innerHTML = JSON.stringify(state, null, 2)
       })
+
       socket.on('graph', graph => {
         const data = {// ...graph }
           path: graph.run,
@@ -47,9 +37,35 @@
         document.querySelector('#graph > pre')
           .innerHTML = JSON.stringify(data, null, 2)
       })
-      socket.on('state', state => {
-        document.querySelector('#state > pre')
-        .innerHTML = JSON.stringify(state, null, 2)
+
+      socket.on('arbitrages', update => {
+        const elem = document.querySelector('#arbitrages > pre')
+        for (timestamp in update) {
+          const time = Number(timestamp)
+          if (!arbitrages[time]) {
+            arbitrages[time] = update[timestamp]
+          document.getElementById('tuturu')
+            .src = 'https://www.myinstants.com/media/sounds/tuturu_1.mp3'
+          }
+        }
+        elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
+          ...json,
+          [new Date(Number(time)).toLocaleString()]: {
+            ...arbitrages[time],
+            resolved: arbitrages[time].resolved
+              && new Date(arbitrages[time].resolved).toLocaleString()
+          }
+        }), {}), null, 2)
+      })
+
+      socket.on('resolve', ({ run, orders, output, profit, }) => {
+        arbitrages[time] = {
+          run,
+          input: orders[0].cost,
+          output,
+          profit,
+          resolved: new Date().getTime()
+        }
       })
     </script>
   </head>
