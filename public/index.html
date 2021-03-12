@@ -16,7 +16,7 @@
         const renderer = document.querySelector('#state > pre')
         renderer.innerHTML = JSON.stringify(state, null, 2)
         if (!profits) {
-          profits = Object.keys(state.balances).reduce((profits, tokens) => ({
+          profits = Object.keys(state.balances).reduce((profits, token) => ({
             ...profits,
             [token]: 0
           }), {})
