@@ -59,10 +59,12 @@ let graph = { ready: false }
 //   }
 // })
 
+console.log('Initialize balances...')
 binance.balance((error, balances) => {
   if ( error ) {
     console.error(error)
   } else {
+    console.log('Got balances')
     const action = { type: 'update.balances',
       balances
     }    
@@ -98,6 +100,7 @@ store.subscribe(_ => {
       graph = require('./store/selectors/graph')(state)
       console.warn('Done.')
       binance.bookTickers((error, ticker) => {
+        console.log('Initialize markets...')
         if (error) {
           console.error(error)
         } else {
@@ -165,7 +168,10 @@ store.subscribe(_ => {
           .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
           .then(watchOrders).catch(die)
           .then(passThrough(_ => lock.unlock(key)))
-          .then(passThrough(r => console.log(JSON.stringify(r, null, 2), 'Resolved.')))
+          .then(passThrough(r => {
+            console.log(JSON.stringify(r, null, 2), 'Resolved.')
+            io.emit('resolved', key)
+          }))
       }
     } else if (mindworthy.length) {
       // io.emit('graph', mindworthy[mindworthy.length - 1])
