@@ -12,6 +12,7 @@
 
       socket.on('state', state => {
         const stateRenderer = document.querySelector('#state > pre')
+        const profitRenderer = document.querySelector('#profit > pre')
         try {
           const balances = JSON.parse(stateRenderer.innerHTML).balances
           let profitsUpdate = false
@@ -39,6 +40,7 @@
           balances: state.balances,
           market: state.market
         }, null, 2)
+        profitRenderer.innerHTML = JSON.stringify(state.profits, null, 2)
       })
 
       socket.on('graph', graph => {
@@ -99,6 +101,10 @@
     <div class="renderer-wrapper">
       <div id="profits" class="renderer">
         Profits since page load:
+        <pre>No data (yet).</pre>
+      </div>
+      <div id="profit" class="renderer">
+        Profit since start:
         <pre>No data (yet).</pre>
       </div>
     </div>
