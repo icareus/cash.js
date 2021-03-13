@@ -7,11 +7,11 @@ module.exports = what => {
 }
 
 module.exports.unlock = key => {
-  if (active.key) {
+  if (active[key]) {
     let ret = active
-    delete(active.key)
+    delete(active[key])
     return ret
   }
 }
 
-module.exports.getActive = _ => Object.keys(active).length && active
+module.exports.getActive = _ => Object.keys(active).length
