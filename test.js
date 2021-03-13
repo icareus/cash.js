@@ -46,7 +46,7 @@ exchangeInfo
   .then(json => fs.writeFile('exchangeInfo.json', json))
   .then(console.log('Wrote to exchangeInfo.json'))
   .then(process.exit)
-  .catch(console.error)
+  .catch(e => console.error(e.body || e))
 
 // const balances = _ => new Promise((resolve, reject) => {
 //   binance.balance((error, balances) => error

@@ -10,28 +10,35 @@
       const socket = io()
       const arbitrages = {}
 
-      let profits
-
       socket.on('state', state => {
-        const renderer = document.querySelector('#state > pre')
-        renderer.innerHTML = JSON.stringify(state, null, 2)
-        if (!profits) {
+        const stateRenderer = document.querySelector('#state > pre')
+        try {
+          const balances = JSON.parse(stateRenderer.innerHTML).balances
+          let profitsUpdate = false
+
+          for(token in balances) {
+            if (state.balances[token] != balances[token]) {
+              profits[token] = profits[token] + (state.balances[token] - balances[token])
+              profitsUpdate = true
+            }
+          }
+          if (profitsUpdate) {
+            document.querySelector('#profits > pre')
+              .innerHTML = JSON.stringify(profits, null, 2)
+          }
+        } catch {
+          console.log('Got first state.', state)
           profits = Object.keys(state.balances).reduce((profits, token) => ({
             ...profits,
             [token]: 0
           }), {})
-        } else {
-          const oldState = JSON.parse(renderer.innerHTML)
-
-          for(token in profits) {
-            profits[token] = profits[token] + (state.balances[token] - oldState.balances[token])
-            state.needs_profits_refresh = true
-          }
-          if (state.needs_profits_refresh) {
-            document.querySelector('#profits > pre')
-              .innerHTML = JSON.stringify(profits, null, 2)
-          }
+          document.querySelector('#profits > pre')
+            .innerHTML = JSON.stringify(profits, null, 2)
         }
+        stateRenderer.innerHTML = JSON.stringify({
+          balances: state.balances,
+          market: state.market
+        }, null, 2)
       })
 
       socket.on('graph', graph => {
@@ -77,10 +84,10 @@
         }), {}), null, 2)
       })
 
-      socket.on('resolve', ({ run, orders, output, profit, }) => {
+      socket.on('resolve', ({ run, orders, input, output, profit, time }) => {
         arbitrages[time] = {
           run,
-          input: orders[0].cost,
+          input,
           output,
           profit,
           resolved: new Date().getTime()

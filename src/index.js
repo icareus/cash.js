@@ -60,34 +60,38 @@ let graph = { ready: false }
 // })
 
 console.log('Initialize balances...')
-binance.balance((error, balances) => {
-  if ( error ) {
-    console.error(error)
-  } else {
-    console.log('Got balances')
-    const action = { type: 'update.balances',
-      balances
-    }    
-    graph.ready = graph.ready === 'ticker'
-      ? true
-      : 'balances'
-    store.dispatch(action)
-
-    binance.websockets.userData(({ B: updatedBalances }) => {
+const initBalances = _ => {
+  binance.balance((error, balances) => {
+    if ( error ) {
+      console.error(error.body)
+      setTimeout(initBalances, 1000)
+    } else {
+      console.log('Got balances')
       const action = { type: 'update.balances',
-        balances: updatedBalances.reduce((balances, balance) => ({
-          ...balances,
-          [balance.a]: {
-            available: balance.f,
-            onOrder: balance.l
-          }
-        }), {})
+        balances
       }
+      graph.ready = graph.ready === 'ticker'
+        ? true
+        : 'balances'
       store.dispatch(action)
-      io.emit(action)
-    })
-  }
-})
+
+      binance.websockets.userData(({ B: updatedBalances }) => {
+        const action = { type: 'update.balances',
+          balances: updatedBalances.reduce((balances, balance) => ({
+            ...balances,
+            [balance.a]: {
+              available: balance.f,
+              onOrder: balance.l
+            }
+          }), {})
+        }
+        store.dispatch(action)
+        io.emit(action)
+      })
+    }
+  })
+}
+initBalances()
 
 const negotiate = require('./util/negotiate')
 
@@ -95,15 +99,23 @@ store.subscribe(_ => {
   const state = store.getState()
 
   if (!graph.geometries) {
-    if (graph.ready) {
-      console.warn('Building graph...')
-      graph = require('./store/selectors/graph')(state)
-      console.warn('Done.')
+    if (graph.ready === 'balances') {
       binance.bookTickers((error, ticker) => {
-        console.log('Initialize markets...')
+        console.warn('Initialize markets...')
         if (error) {
-          console.error(error)
+          die(error.body || error)
         } else {
+          console.warn('Got markets.')
+          // die(JSON.stringify(ticker, null, 2))
+          console.warn('Building graph...')
+          graph = require('./store/selectors/graph')({
+            ...state,
+            markets: ticker.reduce((markets, ticker) => ({
+              ...markets,
+              [ticker.symbol]: ticker
+            }), {})
+          })
+          console.warn('Done.')
           store.dispatch({ type: 'update.symbols',
             symbols: ticker.filter(ticker => graph.markets.includes(ticker.symbol))
           })
@@ -127,6 +139,7 @@ store.subscribe(_ => {
         }
       })
     } else { return }
+    return
   }
 
   const arbiter = require('./util/arbitrage')(state)
@@ -134,10 +147,11 @@ store.subscribe(_ => {
 
   const arbitrages = graph.geometries
     .map(geometry => {
-      // console.log(geometry.map(token => ({ token, balance: state.balances[token].available })), arbiter(geometry, state.balances[geometry[0]].available))
-      return arbiter(geometry, state.balances[geometry[0]].available)
+      return arbiter(geometry, state.balances[geometry[0]].available / 2)
     })
-    .filter(a => a.ratio)
+    .filter(a => {
+      return a.ratio && B(a.ratio) != 0
+    })
     .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
   
   if (arbitrages.length) {
@@ -156,7 +170,7 @@ store.subscribe(_ => {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
       log.hard(arbitrage)
-      // io.emit('graph', arbitrage)
+      io.emit('arbitrage', arbitrage)
       const key = lock(arbitrage)
 
       if (key) {
@@ -164,14 +178,15 @@ store.subscribe(_ => {
         console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage)
-          .then(passThrough(log.hard)).catch(console.error)
+          .then(passThrough(log.hard)).catch(e => console.error(e.body || e))
           .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
-          .then(watchOrders).catch(die)
+          .then(watchOrders).catch(e => die(e.body || e))
           .then(passThrough(_ => lock.unlock(key)))
           .then(passThrough(r => {
             console.log(JSON.stringify(r, null, 2), 'Resolved.')
             io.emit('resolve', { ...arbitrage, time: key })
-          }))
+            return ({ ...arbitrage, time: key })
+          })).catch(e => die(e.body || e))
       }
     } else if (mindworthy.length) {
       // io.emit('graph', mindworthy[mindworthy.length - 1])
@@ -181,6 +196,7 @@ store.subscribe(_ => {
   }
   io.emit('state', {
     balances: simpleBalances(state),
-    market: simpleMarkets(state)
+    profits: state.profits,
+    market: simpleMarkets(state),
   })
 })

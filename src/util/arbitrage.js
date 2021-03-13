@@ -2,32 +2,35 @@ const B = require('./B')
 const orderPath = require('./orderPath')
 
 const arbitrage = (state, run, amount) => {
+  if (!run)
+    return (run, amount) => arbitrage(state, run, amount)
+
   const {
     balances,
     // market
   } = state
   if (run && !amount && amount !== 0) {
-    amount = Number(balances[run[0]].available) / 1000
+    amount = Number(balances[run[0]].available) * 0.8
   }
   const move = orderPath(state)
 
-  if (!run)
-    return (run, amount) => arbitrage(state, run, amount)
-
-  const moves = run.reduce((total, sym, i) => {
+  const graph = run.reduce((arbitrage, sym, i) => {
     const nxt = run[i + 1] ? run[i + 1] : run[0]
-    const { output = amount } = total
+    const { output = amount } = arbitrage
     const hop = move(sym, nxt, output)
-    return {
+    ret = {
       run,
-      ...total,
+      input: arbitrage.input || hop.cost,
+      ...arbitrage,
       output: hop.ret || 0,
-      orders: [...total.orders, hop],
-      profit: total.orders.length && total.orders[0].cost
-        && B(hop.ret || 0).minus(total.orders[0].cost),
-      ratio: total.orders.length && total.orders[0].cost
-        && B(hop.ret || 0).div(total.orders[0].cost)
+      orders: [...arbitrage.orders, hop],
+      profit: arbitrage.orders.length && Number(arbitrage.orders[0].cost)
+        && B(hop.ret || 0).minus(arbitrage.orders[0].cost),
+      ratio: arbitrage.orders.length && Number(arbitrage.orders[0].cost)
+        && B(hop.ret || 0).div(arbitrage.orders[0].cost)
     }
+    // console.log(JSON.stringify(ret, null, 2))
+    return ret
   }, { orders: [] })
 
   let overRatio = {
@@ -40,7 +43,7 @@ const arbitrage = (state, run, amount) => {
       to: null
     }
   }
-  moves.orders.forEach(order => {
+  graph.orders.forEach(order => {
     if (order.from && (Number(order.amount) > Number(order.available))) {
       // ratio = Number(balances[order.from].available) / Number(order.amount)
       ratio = Number(order.available) / Number(order.amount)
@@ -60,7 +63,7 @@ const arbitrage = (state, run, amount) => {
   })
 
   if (overRatio.ratio === null) {
-    return moves
+    return graph
   } else {
     return (arbitrage(state, run, amount * overRatio.ratio * 0.9))
   } 

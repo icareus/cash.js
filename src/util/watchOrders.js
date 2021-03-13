@@ -60,7 +60,7 @@ const watchOrders = orders => new Promise((resolve, reject) => {
   const i = setInterval(_ => {
     console.log(orders)
     Promise.all(orders.filter(o => o).map(checkOrder))
-      .catch(console.error)
+      .catch(e => { console.error(e.body || e) })
       .then(results => {
         const filled = results.filter(order => order.status === 'FILLED')
         const expired = results.filter(order => order.status === 'EXPIRED')
