@@ -9,6 +9,7 @@
     <script>
       const socket = io()
       const arbitrages = {}
+      socket.on('title', t => document.title = t)
 
       socket.on('state', state => {
         const stateRenderer = document.querySelector('#state > pre')
