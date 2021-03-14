@@ -1,12 +1,11 @@
 const B = require('./B')
 
 const fee = 1 - require('./constants').fee
-const info = require('../../exchangeInfo.json')
 
 const { greed } = require('./constants').hyper
 const die = require('./die')
 
-const orderPath = ({ balances, market }) => (from, to, amount = 1) => {
+const orderPath = ({ balances, market, info }) => (from, to, amount = 1) => {
   const { symbol, action } = market[`${from}${to}`]
     ? { symbol: `${from}${to}`, action: 'sell' }
     : { symbol: `${to}${from}`, action: 'buy' }

@@ -1,7 +1,7 @@
 let active = {}
 
-const lock = what => {
-  key = `${new Date().getTime()}`
+const lock = (what, key) => {
+  key = key || `${new Date().getTime()}`
     active[key] = what || true
     return key
 }

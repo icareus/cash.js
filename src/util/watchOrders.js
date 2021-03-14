@@ -52,15 +52,15 @@ const checkOrder = order => new Promise((resolve, reject) => {
   } = order
 
   return binance.orderStatus(symbol, orderId, (error, status) => error
-    ? reject(error)
+    ? reject({ ...order, status: error.body })
     : resolve(status))
 })
 
 const watchOrders = orders => new Promise((resolve, reject) => {
   const i = setInterval(_ => {
-    console.log(orders)
-    Promise.all(orders.filter(o => o).map(checkOrder))
-      .catch(e => { console.error(e.body || e) })
+    // console.log(orders)
+    Promise.all(orders.map(o => { checkOrder(o).catch(e => console.error('Error ordering :', e)) }))
+      .catch(e => die(e, 'SEPPUKU'))
       .then(results => {
         const filled = results.filter(order => order.status === 'FILLED')
         const expired = results.filter(order => order.status === 'EXPIRED')
@@ -68,10 +68,11 @@ const watchOrders = orders => new Promise((resolve, reject) => {
         if (filled.length + expired.length + canceled.length === orders.length) {
           clearInterval(i)
           resolve(orders)
+        } else if (results.filter(order => order.status === 'ERROR')) {
+          reject(orders)
         }
       })
-      // .catch(console.error)
-  }, 1000)
+  }, 5000)
 })
 
 module.exports = watchOrders

@@ -1,5 +1,3 @@
-const { combineReducers } = require('redux')
-
 const Symbol = symbol => (state = { symbol }, update) => {
   const {
     ask = state.ask,
@@ -19,12 +17,6 @@ const Symbol = symbol => (state = { symbol }, update) => {
       : state.bids,
   }
 }
-
-const { markets: symbols } = require('../../util/constants')
-
-const markets = symbols.reduce((reducers, symbol) => {
-  return {...reducers, [symbol]: Symbol(symbol)}
-}, {})
 
 const market = (state = {}, update) => {
   if (update.type === 'update.symbols') {
