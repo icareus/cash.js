@@ -68,18 +68,24 @@ const initBalances = _ => {
     } else {
       console.log('Got balances')
       const action = { type: 'update.balances',
-        balances: Object.keys(balances).filter(token => {
-          const val = Number(balances[token].available) + Number(balances[token].onOrder)
-          return val > 0.01
-        }).reduce((balances, token) => ({
-          ...balances,
-          [token]: balances[token]
-        }), {})
+        balances
+      }
+      const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
+      for (token in action.balances) {
+        // Don't keep null value balances
+        if (! Number(balances[token].available) + Number(balances[token].onOrder)) {
+          delete(balances[token])
+        } else if (shitcoins.includes(token)) {
+          delete(balances[token])
+        }
       }
       graph.ready = graph.ready === 'ticker'
         ? true
         : 'balances'
+
+      console.log(action)
       store.dispatch(action)
+
 
       binance.websockets.userData(({ B: updatedBalances }) => {
         const action = { type: 'update.balances',
@@ -100,6 +106,7 @@ const initBalances = _ => {
 initBalances()
 
 const negotiate = require('./util/negotiate')
+// const { delete } = require('./io/api')
 
 store.subscribe(_ => {
   const state = store.getState()
