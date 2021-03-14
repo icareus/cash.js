@@ -58,6 +58,40 @@ let graph = { ready: false }
 //     })
 //   }
 // })
+console.log('Getting Market info...')
+const upperSnake2LowerCamel = str => str.split('_')
+  .map((word, i) => i
+    ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    : word.toLowerCase())
+  .join('')
+
+const exchangeInfo = new Promise((resolve, reject) =>
+  binance.exchangeInfo((e, infos) => e
+    ? reject(e)
+    : resolve(infos.symbols
+      .reduce((info, symbolInfo) => ({
+        ...info,
+        [symbolInfo.symbol]: symbolInfo.filters
+          .reduce((filters, fltr) => ({
+            ...filters,
+            [upperSnake2LowerCamel(fltr.filterType)]: fltr
+          }), {})
+      }), {})
+    )
+  )
+)
+    
+exchangeInfo
+  .then(info => {
+    console.log('Got exchangeInfo.')
+    graph.ready = graph.ready === 'balances'
+      ? true
+      : 'info'
+    store.dispatch({
+      type: 'exchangeInfo',
+      info
+    })
+  }).catch(e => { throw e })
 
 console.log('Initialize balances...')
 const initBalances = _ => {
@@ -66,7 +100,7 @@ const initBalances = _ => {
       console.error(error.body)
       setTimeout(initBalances, 1000)
     } else {
-      // console.log('Got balances')
+      console.log('Got balances')
       const action = { type: 'update.balances',
         balances
       }
@@ -78,11 +112,10 @@ const initBalances = _ => {
           delete(balances[token])
         }
       }
-      graph.ready = graph.ready === 'ticker'
+      graph.ready = graph.ready === 'info'
         ? true
         : 'balances'
 
-      // console.log(action)
       store.dispatch(action)
 
 
@@ -111,7 +144,7 @@ store.subscribe(_ => {
   const state = store.getState()
 
   if (!graph.geometries) {
-    if (graph.ready === 'balances') {
+    if (graph.ready === true) {
       binance.bookTickers((error, ticker) => {
         console.warn('Initialize markets...')
         if (error) {
@@ -154,7 +187,8 @@ store.subscribe(_ => {
     return
   }
 
-  const arbiter = require('./util/arbitrage')(state)
+  // console.log('Market info:', state.info)
+  let arbiter = require('./util/arbitrage')(state)
   const watchOrders = require('./util/watchOrders')
 
   const arbitrages = graph.geometries
