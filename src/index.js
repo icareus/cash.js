@@ -66,16 +66,15 @@ const initBalances = _ => {
       console.error(error.body)
       setTimeout(initBalances, 1000)
     } else {
-      console.log('Got balances')
+      // console.log('Got balances')
       const action = { type: 'update.balances',
         balances
       }
       const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
       for (token in action.balances) {
         // Don't keep null value balances
-        if (! Number(balances[token].available) + Number(balances[token].onOrder)) {
-          delete(balances[token])
-        } else if (shitcoins.includes(token)) {
+        if (! Number(balances[token].available) + Number(balances[token].onOrder)
+          || shitcoins.includes(token)) {
           delete(balances[token])
         }
       }
@@ -83,7 +82,7 @@ const initBalances = _ => {
         ? true
         : 'balances'
 
-      console.log(action)
+      // console.log(action)
       store.dispatch(action)
 
 
@@ -128,7 +127,7 @@ store.subscribe(_ => {
               [ticker.symbol]: ticker
             }), {})
           })
-          console.warn('Done.')
+          console.warn('\nDone.')
           store.dispatch({ type: 'update.symbols',
             symbols: ticker.filter(ticker => graph.markets.includes(ticker.symbol))
           })
@@ -192,14 +191,15 @@ store.subscribe(_ => {
 
         negotiate(arbitrage)
           .then(passThrough(log.hard)).catch(e => console.error(e.body || e))
-          .then(passThrough(x => console.log(JSON.stringify(x, null, 2))))
-          .then(watchOrders).catch(e => die(e.body || e))
+          .then(passThrough(orders => lock[key].orders = orders))
+          .then(watchOrders).catch(e => die(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
-          .then(passThrough(r => {
+          .then(resolvedOrders => {
             console.log(JSON.stringify(r, null, 2), 'Resolved.')
-            io.emit('resolve', { ...arbitrage, time: key })
-            return ({ ...arbitrage, time: key })
-          })).catch(e => die(e.body || e))
+            const arbitrage = { ...arbitrage, time: key, orders: resolvedOrders }
+            io.emit('resolved', arbitrage)
+            return arbitrage
+          }).catch(e => die(e.body || e))
       }
     } else if (mindworthy.length) {
       // io.emit('graph', mindworthy[mindworthy.length - 1])
