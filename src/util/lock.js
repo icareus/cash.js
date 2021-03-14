@@ -1,12 +1,12 @@
 let active = {}
 
-module.exports = what => {
+const lock = what => {
   key = `${new Date().getTime()}`
     active[key] = what || true
     return key
 }
 
-module.exports.unlock = key => {
+lock.unlock = key => {
   if (active[key]) {
     let ret = active
     delete(active[key])
@@ -14,4 +14,6 @@ module.exports.unlock = key => {
   }
 }
 
-module.exports.getActive = _ => Object.keys(active).length
+lock.getActive = _ => Object.keys(active).length && active
+
+module.exports = lock

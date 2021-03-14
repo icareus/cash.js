@@ -68,7 +68,13 @@ const initBalances = _ => {
     } else {
       console.log('Got balances')
       const action = { type: 'update.balances',
-        balances
+        Object.keys(balances).filter(token => {
+          const val = Number(balances[token].available) + Number(balances[token].onOrder)
+          return val > 0.01
+        }).reduce((balances, token) => ({
+          ...balances,
+          [token]: balances[token]
+        }), {})
       }
       graph.ready = graph.ready === 'ticker'
         ? true
