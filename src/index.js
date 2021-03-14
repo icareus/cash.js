@@ -100,7 +100,7 @@ const initBalances = _ => {
       console.error(error.body)
       setTimeout(initBalances, 1000)
     } else {
-      console.log('Got balances')
+      // console.log('Got balances')
       const action = { type: 'update.balances',
         balances
       }
@@ -116,6 +116,7 @@ const initBalances = _ => {
         ? true
         : 'balances'
 
+      // console.log(action)
       store.dispatch(action)
 
 
