@@ -106,7 +106,7 @@ const initBalances = _ => {
       // const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
       for (token in balances) {
         // Don't keep null value balances
-        if (! Number(balances[token].available) + Number(balances[token].onOrder)
+        if ((Number(balances[token].available) + Number(balances[token].onOrder) == 0)
           || shitcoins.includes(token)) { // Ignore shitcoins
           delete(balances[token])
         }
