@@ -128,9 +128,10 @@ const initBalances = _ => {
             onOrder: balance.l
           }
         }), {})
-        store.dispatch({ type: 'update.balances',
+        const action = { type: 'update.balances',
           balances
-        })
+        }
+        store.dispatch(action)
         io.emit(action)
       })
     }
