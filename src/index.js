@@ -111,27 +111,26 @@ const initBalances = _ => {
           delete(balances[token])
         }
       }
-      const action = { type: 'update.balances',
-        balances
-      }
+
       graph.ready = graph.ready === 'info'
         ? true
         : 'balances'
 
-      store.dispatch(action)
-
+      store.dispatch({ type: 'update.balances',
+        balances
+      })
 
       binance.websockets.userData(({ B: updatedBalances }) => {
-        const action = { type: 'update.balances',
-          balances: updatedBalances.reduce((balances, balance) => ({
-            ...balances,
-            [balance.a]: {
-              available: balance.f,
-              onOrder: balance.l
-            }
-          }), {})
-        }
-        store.dispatch(action)
+        const balances = updatedBalances.reduce((balances, balance) => ({
+          ...balances,
+          [balance.a]: {
+            available: balance.f,
+            onOrder: balance.l
+          }
+        }), {})
+        store.dispatch({ type: 'update.balances',
+          balances
+        })
         io.emit(action)
       })
     }
