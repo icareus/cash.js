@@ -5,7 +5,7 @@
     <title>cash.js</title>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/main.css">
-    <audio id="tuturu" src="https://www.myinstants.com/media/sounds/tuturu_1.mp3"></audio>
+    <audio id="tuturu" autoplay></audio>
     <script>
       const socket = io()
       const arbitrages = {}
@@ -71,12 +71,12 @@
       })
 
       socket.on('arbitrages', update => {
+        document.getElementById('tuturu').src="https://www.myinstants.com/media/sounds/tuturu_1.mp3"
         const elem = document.querySelector('#arbitrages > pre')
         for (timestamp in update) {
           const time = Number(timestamp)
           if (!arbitrages[time]) {
             arbitrages[time] = update[timestamp]
-          document.getElementById('tuturu').play()
           }
         }
         elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
@@ -89,7 +89,7 @@
         }), {}), null, 2)
       })
 
-      socket.on('resolve', ({ run, orders, input, output, profit, time }) => {
+      socket.on('resolved', ({ run, orders, input, output, profit, time }) => {
         arbitrages[time] = {
           run,
           input,
