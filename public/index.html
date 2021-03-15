@@ -28,8 +28,8 @@
             document.querySelector('#profits > pre')
               .innerHTML = JSON.stringify(profits, null, 2)
           }
-        } catch {
-          console.log('Got first state.', state)
+        } catch {// First time getting state, JSON.parse threw
+          // console.log('Got first state.', state)
           profits = Object.keys(state.balances).reduce((profits, token) => ({
             ...profits,
             [token]: 0
@@ -64,7 +64,10 @@
           ratio: graph.ratio
         }
         document.querySelector('#graph > pre')
-          .innerHTML = JSON.stringify(data, null, 2)
+          .innerHTML = JSON.stringify({
+            ...data,
+            time: new Date(data.time || new Date()).toLocaleString()
+          }, null, 2)
       })
 
       socket.on('arbitrages', update => {
@@ -101,11 +104,11 @@
   <body>
     <div class="renderer-wrapper">
       <div id="profits" class="renderer">
-        Profits since page load:
+        <span>Profits since page load:</span>
         <pre>No data (yet).</pre>
       </div>
       <div id="profit" class="renderer">
-        Profit since start:
+        <span>Profit since start:</span>
         <pre>No data (yet).</pre>
       </div>
     </div>
@@ -115,11 +118,11 @@
         <pre>No data (yet).</pre>
       </div>
       <div id="graph" class="renderer">
-        Most profitable graph:
+        <span>Most profitable graph:</span>
         <pre>No data (yet).</pre>
       </div>
       <div id="arbitrages" class="renderer">
-        Arbitrages:
+        <span>Arbitrages:</span>
         <pre>No data (yet).</pre>
       </div>
     </div>

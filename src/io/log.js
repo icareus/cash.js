@@ -23,10 +23,14 @@ const put = (...logs) => {
 
 // Defer that side effect tyty <3
 const hard = log => new Promise((resolve, reject) => {
+  const {
+    LOCALE: locale = Intl.DateTimeFormat().resolvedOptions().locale,
+    TZ: timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  } = process.env
   if (!log || !Object.keys(log).length) {
     reject(log)
   } else {
-    let logPath = path.join(dir, `${new Date().toISOString()}.json`)
+    let logPath = path.join(dir, `${ new Date().toISOString(locale, { timeZone }) }.json`)
     if (process.platform == 'win32') {
       const rxp = /\:/g
       logPath = logPath.replace(rxp, '.')

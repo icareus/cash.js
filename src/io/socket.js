@@ -7,7 +7,7 @@ module.exports = (srv, options = {serveClient: true}) => {
 
   io.on('connection', client => {
     console.log(`connection: ${client.id}`)
-    client.emit(`title`, `${title}`)
+    client.emit(`title`, `${title}${process.env.GREED && ' ('+process.env.GREED+')'}`)
     client.on('disconnect', _ => console.log(`disconnect: ${client.id}`))
   })
 

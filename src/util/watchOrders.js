@@ -59,7 +59,7 @@ const checkOrder = order => new Promise((resolve, reject) => {
 const watchOrders = orders => new Promise((resolve, reject) => {
   const i = setInterval(_ => {
     // console.log(orders)
-    Promise.all(orders.map(o => { checkOrder(o).catch(e => console.error('Error ordering :', e)) }))
+    Promise.all(orders.map(o => checkOrder(o).catch(e => die('Error ordering :', e))))
       .catch(e => die(e, 'SEPPUKU'))
       .then(results => {
         const filled = results.filter(order => order.status === 'FILLED')

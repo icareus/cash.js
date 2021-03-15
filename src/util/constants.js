@@ -7,6 +7,7 @@ module.exports = {
     high: 1.001,
     mid: 1.0001,
     low: 0.975
-  }
+  },
+  shitcoins: ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
 }
 // TODO: Better init & stuff.

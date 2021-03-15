@@ -20,7 +20,8 @@ console.log(`Initializing values...`)
 const {
   // watchlist: graph,
   // markets: symbols,
-  thresholds
+  thresholds,
+  shitcoins
 } = require('./util/constants')
 
 const B = require('./util/B')
@@ -101,16 +102,17 @@ const initBalances = _ => {
       setTimeout(initBalances, 1000)
     } else {
       console.log('Got balances')
-      const action = { type: 'update.balances',
-        balances
-      }
-      const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
-      for (token in action.balances) {
+
+      // const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
+      for (token in balances) {
         // Don't keep null value balances
         if (! Number(balances[token].available) + Number(balances[token].onOrder)
-          || shitcoins.includes(token)) {
+          || shitcoins.includes(token)) { // Ignore shitcoins
           delete(balances[token])
         }
+      }
+      const action = { type: 'update.balances',
+        balances
       }
       graph.ready = graph.ready === 'info'
         ? true
@@ -215,7 +217,6 @@ store.subscribe(_ => {
   if (!lock.getActive()) {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
-      log.hard(arbitrage)
       io.emit('arbitrage', arbitrage)
       const key = lock(arbitrage)
 
@@ -224,8 +225,9 @@ store.subscribe(_ => {
         console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage)
-          .then(passThrough(log.hard)).catch(e => console.error(e.body || e))
-          .then(passThrough(orders => lock[key].orders = orders))
+          .then(passThrough(negociated => log.hard({ ...arbitrage, negociated })))
+            .catch(e => console.error(e.body || e))
+          .then(passThrough(console.log))
           .then(watchOrders).catch(e => die(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
           .then(resolvedOrders => {
