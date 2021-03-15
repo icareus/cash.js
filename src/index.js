@@ -23,6 +23,7 @@ const {
   thresholds,
   shitcoins
 } = require('./util/constants')
+const { balanceRatio } = require('./util/constants').hyper
 
 const B = require('./util/B')
 
@@ -195,7 +196,7 @@ store.subscribe(_ => {
 
   const arbitrages = graph.geometries
     .map(geometry => {
-      return arbiter(geometry, state.balances[geometry[0]].available / 2)
+      return arbiter(geometry, state.balances[geometry[0]].available * balanceRatio)
     })
     .filter(a => {
       return a.ratio && B(a.ratio) != 0
@@ -209,10 +210,10 @@ store.subscribe(_ => {
   }
 
   const mindworthy = arbitrages
-    .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.low)) : null)
+    .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.log)) : null)
 
   const costworthy = mindworthy
-    .filter(arb => B(arb.ratio).gt(B(thresholds.mid)))
+    .filter(arb => B(arb.ratio).gt(B(thresholds.bid)))
 
   if (!lock.getActive()) {
     if (costworthy.length) {

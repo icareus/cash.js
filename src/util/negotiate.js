@@ -42,7 +42,7 @@ const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null,
     .map(o => order(o).catch(e => console.error('Error ordering: ', e.body || e.message)))
   ).catch(e => die(`CAUGHT ! ${e.body || e}`))
   .then(nego => {
-    console.warn('Negociated:', nego)
+    console.log('Negociated:', nego)
     return nego
   }).catch(e => {
     console.error('Negociation error.', e.body.msg || e.body || e)
