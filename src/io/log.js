@@ -3,7 +3,7 @@ const path = require('path')
 // const die = require('../util/die')
 
 const {
-  LOG_DIR: dir = '/dev/null'
+  LOG_DIR: dir = 'public/logs'
 } = process.env
 
 if (fs.existsSync(dir)) {
