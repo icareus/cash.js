@@ -29,37 +29,6 @@ const B = require('./util/B')
 
 let graph = { ready: false }
 
-// binance.bookTickers((error, ticker) => {
-//   if (error) {
-//     console.error(error)
-//   } else {
-//     store.dispatch({ type: 'update.symbols',
-//       symbols: ticker
-//     })
-
-//     graph.ready = graph.ready === 'balances'
-//       ? true
-//       : 'ticker'
-
-//     binance.websockets.depthCache(symbols, (symbol, depth) => {
-//       let { bids, asks } = depth
-
-//       bids = binance.sortBids(bids)
-//       asks = binance.sortAsks(asks)
-
-//       const action = { type: 'update.symbol',
-//         symbol,
-//         ask: binance.first(asks),
-//         bid: binance.first(bids),
-//         asks,
-//         bids
-//       }
-
-//       store.dispatch(action)
-//       io.emit(action)
-//     })
-//   }
-// })
 console.log('Getting Market info...')
 const upperSnake2LowerCamel = str => str.split('_')
   .map((word, i) => i
@@ -104,7 +73,6 @@ const initBalances = _ => {
     } else {
       console.log('Got balances')
 
-      // const shitcoins = ['EOP', 'EON', 'ATD', 'ADD', 'MEETONE', 'CLOAK', 'CTR', 'MCO']
       for (token in balances) {
         // Don't keep null value balances
         if ((Number(balances[token].available) + Number(balances[token].onOrder) == 0)
@@ -149,13 +117,13 @@ store.subscribe(_ => {
   if (!graph.geometries) {
     if (graph.ready === true) {
       binance.bookTickers((error, ticker) => {
-        console.warn('Initialize markets...')
+        console.log('Initialize markets...')
         if (error) {
           die(error.body || error)
         } else {
-          console.warn('Got markets.')
+          console.log('Got markets.')
           // die(JSON.stringify(ticker, null, 2))
-          console.warn('Building graph...')
+          console.log('Building graph...')
           graph = require('./store/selectors/graph')({
             ...state,
             markets: ticker.reduce((markets, ticker) => ({
@@ -163,7 +131,7 @@ store.subscribe(_ => {
               [ticker.symbol]: ticker
             }), {})
           })
-          console.warn('\nDone.')
+          console.log('\nDone.')
           store.dispatch({ type: 'update.symbols',
             symbols: ticker.filter(ticker => graph.markets.includes(ticker.symbol))
           })
