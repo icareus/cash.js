@@ -14,6 +14,9 @@ lock.unlock = key => {
   }
 }
 
-lock.getActive = _ => Object.keys(active).length && active
+lock.getActive = key => (key
+  ? active[key]
+  : Object.keys(active).length && active
+)
 
 module.exports = lock

@@ -6,7 +6,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/main.css">
     <audio id="tuturu" autoplay></audio>
+
     <script>
+      const audioPlayer = document.getElementById('tuturu')
+      window.onload = _ => audioPlayer.play()
+      window.onreadystatechange = _ => { window.audioPlayer = document.getElementById('tuturu' )}
       const socket = io()
       const arbitrages = {}
       socket.on('title', t => document.title = t)
@@ -30,6 +34,7 @@
           }
         } catch {// First time getting state, JSON.parse threw
           // console.log('Got first state.', state)
+          audioPlayer.src="audio/startup.mp3"
           profits = Object.keys(state.balances).reduce((profits, token) => ({
             ...profits,
             [token]: 0
@@ -71,7 +76,7 @@
       })
 
       socket.on('arbitrages', update => {
-        document.getElementById('tuturu').src="https://www.myinstants.com/media/sounds/tuturu_1.mp3"
+        audioPlayer.src="audio/tuturu.mp3"
         const elem = document.querySelector('#arbitrages > pre')
         for (timestamp in update) {
           const time = Number(timestamp)
@@ -97,9 +102,11 @@
           profit,
           resolved: new Date().getTime()
         }
+        audioPlayer.src = 'audio/rupee-collect.mp3'
       })
     </script>
   </head>
+
   <body>
     <div class="renderer-wrapper">
       <div id="profits" class="renderer">
