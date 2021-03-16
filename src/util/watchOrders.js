@@ -68,7 +68,7 @@ const watchOrders = orders => new Promise((resolve, reject) => {
         if (filled.length + expired.length + canceled.length === orders.length) {
           clearInterval(i)
           resolve(orders)
-        } else if (results.filter(order => order.status === 'ERROR')) {
+        } else if (results.filter(order => order.status === 'ERROR').length) {
           reject(orders)
         }
       })
