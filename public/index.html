@@ -76,12 +76,12 @@
       })
 
       socket.on('arbitrages', update => {
-        audioPlayer.src="audio/tuturu.mp3"
         const elem = document.querySelector('#arbitrages > pre')
         for (timestamp in update) {
           const time = Number(timestamp)
           if (!arbitrages[time]) {
             arbitrages[time] = update[timestamp]
+            audioPlayer.src="audio/tuturu.mp3"
           }
         }
         elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
