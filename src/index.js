@@ -186,24 +186,29 @@ store.subscribe(_ => {
   if (!lock.getActive()) {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
-      io.emit('arbitrage', arbitrage)
       const key = lock(arbitrage)
 
       if (key) {
         console.clear()
         console.info(`Got lock: ${key}`)
 
-        negotiate(arbitrage)
-          .then(passThrough(negociated => log.hard({ ...arbitrage, negociated })))
-            .catch(e => console.error(e.body || e))
+        negotiate(arbitrage).catch(e => console.error(e.body || e))
+          .then(passThrough(negociated => {
+            io.emit('arbitrage', { ...arbitrage, time: key })
+            log.hard({ ...arbitrage, time: key, negociated }) }))
           .then(passThrough(console.log))
           .then(watchOrders).catch(e => die.error(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
           .then(resolvedOrders => {
             console.log(JSON.stringify(resolvedOrders, null, 2), 'Resolved.')
-            const arbitrage = { ...arbitrage, time: key, orders: resolvedOrders }
-            io.emit('resolved', arbitrage)
-            return arbitrage
+            // const arbitrage = { ...arbitrage, time: key, orders: resolvedOrders }
+            result = {
+              ...arbitrage,
+              time: key,
+              negociated: resolvedOrders
+            }
+            io.emit('resolved', result)
+            return result
           }).catch(e => die.error('Arbitrage resolution error',e.body || e))
       }
     } else if (mindworthy.length) {
