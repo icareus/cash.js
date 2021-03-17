@@ -200,11 +200,11 @@ store.subscribe(_ => {
           .then(watchOrders).catch(e => die.error(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
           .then(resolvedOrders => {
-            console.log(JSON.stringify(r, null, 2), 'Resolved.')
+            console.log(JSON.stringify(resolvedOrders, null, 2), 'Resolved.')
             const arbitrage = { ...arbitrage, time: key, orders: resolvedOrders }
             io.emit('resolved', arbitrage)
             return arbitrage
-          }).catch(e => die.error('STILL CRASHING',e.body || e))
+          }).catch(e => die.error('Arbitrage resolution error',e.body || e))
       }
     } else if (mindworthy.length) {
       // io.emit('graph', mindworthy[mindworthy.length - 1])
