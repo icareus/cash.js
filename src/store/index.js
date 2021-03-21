@@ -1,5 +1,8 @@
-const { combineReducers, createStore } = require('redux')
+const { combineReducers, createStore, applyMiddleware } = require('redux')
 
 const reducers = require('./dux')
+const middleware = require('./middleware')
 
-module.exports = createStore(combineReducers(reducers))
+const store = createStore(combineReducers(reducers), applyMiddleware(...middleware))
+
+module.exports = store

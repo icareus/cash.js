@@ -5,13 +5,14 @@ const fee = 1 - require('./constants').fee
 const { greed } = require('./constants').hyper
 const die = require('./die')
 
-const orderPath = ({ balances, market, info }) => (from, to, amount = 1) => {
+const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount = 1) => {
   const { symbol, action } = market[`${from}${to}`]
     ? { symbol: `${from}${to}`, action: 'sell' }
     : { symbol: `${to}${from}`, action: 'buy' }
 
   if (!action || !symbol ) { throw(`Invalid path from ${from} to ${to}`) }
 
+  // console.log(symbol, info[symbol], 'In orderPath')
   const volTick = info[symbol].lotSize.stepSize
   const volPrec = (Number(volTick).toString().split('.')[1] || '').length
   const priceTick = info[symbol].priceFilter.tickSize

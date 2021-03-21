@@ -1,11 +1,13 @@
-const market = require('./market')
 const balances = require('./balances')
+const graph = require('./graph')
+const marketInfo = require('./marketInfo')
+const market = require('./market')
 const profits = require('./profits')
-const info = require('./marketInfo')
 
 module.exports = {
-  market,
-  info,
   balances,
+  graph,
+  marketInfo,
+  market,
   profits
 }
