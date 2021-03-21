@@ -2,8 +2,8 @@ const B = require('../../util/B')
 
 const Symbol = symbol => (state = { symbol }, update) => {
   const {
-    bestAsk: ask = state.ask,
-    bestBid: bid = state.bid
+    bid,
+    ask
   } = update.data
 
   const newState = {
@@ -22,12 +22,15 @@ const market = (state = {}, update) => {
         bidPrice: bid,
         askPrice: ask
       } = update.symbols[symbol]
+      const spread = B(ask).minus(bid)
+      if (symbol === '')
+      console.log(symbol, spread)
       return ({
         ...state,
         [symbol]: {
           bid,
           ask,
-          spread: Number(ask) - Number(bid),
+          spread
         }
       })
     }, {})

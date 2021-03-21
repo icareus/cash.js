@@ -10,7 +10,7 @@ const arbitrage = (state, run, amount) => {
     // market
   } = state
   if (run && !amount && amount !== 0) {
-    amount = Number(balances[run[0]].available) * 0.8
+    amount = B(balances[run[0]].available) * 0.1
   }
   const move = orderPath(state)
 

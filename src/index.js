@@ -2,6 +2,7 @@ console.log('Loading utilities...')
 const lock = require('./util/lock')
 const passThrough = require('./util/passThrough')
 const die = require('./util/die')
+const B = require('./util/B')
 
 console.log('Loading i/o features...')
 const {
@@ -18,8 +19,6 @@ const store = require('./store')
 
 const { thresholds } = require('./util/constants')
 const { balanceRatio } = require('./util/constants').hyper
-
-const B = require('./util/B')
 
 const negotiate = require('./util/negotiate')
 

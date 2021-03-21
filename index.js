@@ -1,6 +1,8 @@
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '.env') })
 
+const B = require('./src/util/B')
+
 const store = require('./src/store')
 const { binance } = require('./src/io')
 const { shitcoins } = require('./src/util/constants')
@@ -43,8 +45,8 @@ const initBalances = _ => {
       if (error) { reject(error) }
 
       for (token in balances) {
-        const available = Number(balances[token].available)
-                        + Number(balances[token].onOrder)
+        const available = B(balances[token].available)
+                        .add(balances[token].onOrder)
       
         if (available == 0 || shitcoins.includes(token)) {
           delete(balances[token])
@@ -106,4 +108,6 @@ initExchange()
     return initBalances() })
   .then(_ => {
     console.log('Got balances.')
-  }).then(require('./src'))
+  }).then(_ => {
+    require('./src')
+  })

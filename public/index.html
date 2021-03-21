@@ -24,7 +24,7 @@
 
           for(token in balances) {
             if (state.balances[token] != balances[token]) {
-              profits[token] = profits[token] + (state.balances[token] - balances[token])
+              profits[token] = profits[token] + state.balances[token] - balances[token]
               profitsUpdate = true
             }
           }
@@ -35,10 +35,13 @@
         } catch {// First time getting state, JSON.parse threw
           // console.log('Got first state.', state)
           audioPlayer.src="audio/startup.mp3"
-          profits = Object.keys(state.balances).reduce((profits, token) => ({
-            ...profits,
-            [token]: 0
-          }), {})
+          for (token in state.balances) {
+            profits[token] = 0
+          }
+          // profits = Object.keys(state.balances).reduce((profits, token) => ({
+          //   ...profits,
+          //   [token]: 0
+          // }), state.balances)
           document.querySelector('#profits > pre')
             .innerHTML = JSON.stringify(profits, null, 2)
         }
@@ -114,7 +117,7 @@
         <pre>No data (yet).</pre>
       </div>
       <div id="profit" class="renderer">
-        <span>Profit since start:</span>
+        <span>Profit since bot start:</span>
         <pre>No data (yet).</pre>
       </div>
     </div>

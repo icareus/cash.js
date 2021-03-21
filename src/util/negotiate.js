@@ -1,11 +1,6 @@
 const binance = require('../io/binance')
 const B = require('./B')
 const die = require('./die')
-// var quantity = 5, price = 0.00402030;
-// binance.buy("BNBETH", quantity, price, {type:'LIMIT'}, (error, response) => {
-//   console.log("Limit Buy response", response);
-//   console.log("order id: " + response.orderId);
-// });
 
 const BELL = '\u0007'
 
@@ -28,13 +23,7 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
       vol: Number(vol),
       rate: Number(rate)
     })
-    binance[action](...params,
-      // symbol,
-      // `${Number(B(vol))}`,
-      // `${Number(B(rate))}`,
-      // {type: 'LIMIT'},
-      handler
-    )
+    binance[action](...params, handler)
   }).catch(e => console.error(`Order error: ${e.body}`))
 
 const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null, 2)) ||

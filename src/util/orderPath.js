@@ -42,13 +42,6 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     : B(mkt.bid).plus(scratch)
 
   if (!Number(rate)) {
-    // die(`No rate: ${JSON.stringify({
-    //   symbol,
-    //   mkt,
-    //   rate,
-    //   scratch,
-    //   greed,
-    // }, null, 2)}`)
     return {}
   }
 
@@ -62,7 +55,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     ? vol
     : B(amount).toFixed(pricePrec)
 
-  // The actual amount we're receivint (real output)
+  // The actual amount we're receiving (real output)
   const ret = action == 'buy'
     ? B(cost).div(rate).times(fee).toFixed(volPrec)
     : B(vol).times(rate).times(fee).toFixed(pricePrec)

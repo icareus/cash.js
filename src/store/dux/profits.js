@@ -1,3 +1,5 @@
+const B = require('../../util/B')
+
 let assets = {}
 
 const profitReducer = (profits = {}, update) => {
@@ -7,9 +9,12 @@ const profitReducer = (profits = {}, update) => {
         const { balances } = update
 
         ret = Object.keys(balances)
-            .filter(token => (Number(balances[token].available) + Number(balances[token].onOrder)))
+            .filter(token => B(balances[token].available)
+                            .add(balances[token].onOrder)
+                            .gt(0))
             .reduce((state, token) => {
-                const asset = Number(balances[token].available) + Number(balances[token].onOrder)
+                const asset = B(balances[token].available)
+                            .add(balances[token].onOrder)
                 if (!assets[token]) {
                     assets[token] = asset
                 }
