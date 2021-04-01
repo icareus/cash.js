@@ -6,11 +6,12 @@ const { greed } = require('./constants').hyper
 const die = require('./die')
 
 const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount = 1) => {
-  const { symbol, action } = market[`${from}${to}`]
-    ? { symbol: `${from}${to}`, action: 'sell' }
-    : { symbol: `${to}${from}`, action: 'buy' }
+  console.log('In OrderPath')
+  const { symbol, side } = market[`${from}${to}`]
+    ? { symbol: `${from}${to}`, side: 'sell' }
+    : { symbol: `${to}${from}`, side: 'buy' }
 
-  if (!action || !symbol ) { throw(`Invalid path from ${from} to ${to}`) }
+  if (!side || !symbol ) { throw(`Invalid path from ${from} to ${to}`) }
 
   // console.log(symbol, info[symbol], 'In orderPath')
   const volTick = info[symbol].lotSize.stepSize
@@ -24,43 +25,47 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   }
   if (!mkt.bid || !mkt.ask) {
     die(`No bid or ask for ${mkt}`)
+    console.log('Return chibré')
     return {}
   }
 
   const spread = B(mkt.ask).minus(mkt.bid)
 
-  // Scratch = slippage
-  // Note: Spread.abs() in case there's no ask / bid at all
-  let scratch = B(spread).abs().times(greed).toFixed(pricePrec)
-  if (B(scratch).gt(mkt.ask) || B(scratch).gt(mkt.bid)) {
-    scratch = B(spread).abs().div(greed)
-  }
+  let scratch = B(spread).times(greed)
 
-  // The actual price going into the order
-  let rate = action == 'buy'
-    ? B(mkt.ask).minus(scratch)
-    : B(mkt.bid).plus(scratch)
+  let rate
+  if (side == 'buy') {
+    rate = B(mkt.ask).minus(scratch)
+  } else {
+    rate = B(mkt.ask).plus(scratch)
+  }
+  rate = rate.toFixed(priceTick)
 
   if (!Number(rate)) {
+    console.log('Second return')
     return {}
   }
 
-  // The quantity we're actually ordering
-  const vol = action == 'sell'
-    ? B(amount).toFixed(volPrec)
-    : B(amount).div(rate).toFixed(volPrec)
+  let baseQty
+  if (side == 'sell') {
+    baseQty = B(amount).toFixed(volPrec)
+  } else {
+    baseQty = B(amount).times(rate).toFixed(volPrec)
+    rate = B(amount).div(baseQty)
+  }
+
+  let quoteQty = baseQty.times(rate)
 
   // the actual amount we're moving (real input)
-  const cost = action == 'sell'
-    ? vol
-    : B(amount).toFixed(pricePrec)
+  const cost = side == 'sell'
+    ? baseQty
+    : quoteQty
 
   // The actual amount we're receiving (real output)
-  const ret = action == 'buy'
-    ? B(cost).div(rate).times(fee).toFixed(volPrec)
-    : B(vol).times(rate).times(fee).toFixed(pricePrec)
+  const ret = side == 'buy'
+    ? baseQty
+    : quoteQty
 
-  const notional = B(vol).times(rate)
   const minNotional = info[symbol].minNotional.minNotional
 
   const path = {
@@ -69,24 +74,23 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     from,
     to,
     symbol,
-    action,
-    vol,
+    action: side,
+    vol: baseQty,
     at: rate,
-    cost,
+    cost: side == 'sell' ? baseQty : quoteQty,
     greed,
     spread,
     scratch,
     priceTick,
     pricePrec,
     mkt,
-    notional,
+    notional: quoteQty,
     minNotional,
     ret
   }
 
-
-  // return B(path.ret).gt(B(info[symbol].minNotional.minNotional))
-  return B(notional).gt(B(minNotional))
+  console.log('OrderPath end')
+  return B(quoteQty).gt(minNotional)
     ? path
     : {}
 }

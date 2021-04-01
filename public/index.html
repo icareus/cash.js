@@ -97,7 +97,9 @@
         }), {}), null, 2)
       })
 
-      socket.on('resolved', ({ run, orders, input, output, profit, time }) => {
+      socket.on('resolved', arbitrage => {
+        const { run, orders, input, output, profit, time } = arbitrage
+        console.log('Arbitrage resolved', arbitrage)
         arbitrages[time] = {
           run,
           input,

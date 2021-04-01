@@ -26,7 +26,7 @@ const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
     binance[action](...params, handler)
   }).catch(e => console.error(`Order error: ${e.body}`))
 
-const negociate = arbitrage => console.log(BELL, JSON.stringify(arbitrage, null, 2)) ||
+const negociate = arbitrage => console.log('TUTURU', JSON.stringify(arbitrage, null, 2)) ||
   Promise.all(arbitrage.orders
     .map(o => order(o).catch(e => console.error('Error ordering: ', e.body || e.message)))
   ).catch(e => die(`CAUGHT ! ${e.body || e}`))

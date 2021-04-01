@@ -24,7 +24,7 @@ const market = (state = {}, update) => {
       } = update.symbols[symbol]
       const spread = B(ask).minus(bid)
       if (symbol === '')
-      console.log(symbol, spread)
+      console.log(`Symbol: ${symbol}, spread: ${spread}`)
       return ({
         ...state,
         [symbol]: {

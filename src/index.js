@@ -44,14 +44,15 @@ store.subscribe(_ => {
   }
 
   const mindworthy = arbitrages
-    .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.log)) : null)
+  .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.log)) : null)
 
   const costworthy = mindworthy
-    .filter(arb => B(arb.ratio).gt(B(thresholds.bid)))
+  .filter(arb => B(arb.ratio).gt(B(thresholds.bid)))
 
   if (!lock.getActive()) {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
+      io.emit('arbitrage', { ...arbitrage, time: new Date().getTime() })
       const key = lock(arbitrage)
 
       if (key) {
@@ -59,10 +60,13 @@ store.subscribe(_ => {
         console.info(`Got lock: ${key}`)
 
         negotiate(arbitrage).catch(e => console.error('BLEHHH', e.body || e))
+        // new Promise((resolve) => resolve(arbitrage))
           .then(passThrough(negociated => {
             io.emit('arbitrage', { ...arbitrage, time: key })
             log.hard({ ...arbitrage, time: key, negociated }) }))
-          .then(passThrough(console.log))
+          .then(passThrough(x => {
+            console.log(x, "HERE")
+          }))
           .then(watchOrders).catch(e => die.error(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
           .then(resolvedOrders => {
