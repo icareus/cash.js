@@ -16,6 +16,7 @@
   "author": "ubarbaxor",
   "license": "UNLICENSED",
   "devDependencies": {
+    "magic-globals": "^0.9.1",
     "nodemon": "^1.15.1"
   },
   "dependencies": {

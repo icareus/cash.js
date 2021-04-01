@@ -6,7 +6,6 @@ const { greed } = require('./constants').hyper
 const die = require('./die')
 
 const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount = 1) => {
-  console.log('In OrderPath')
   const { symbol, side } = market[`${from}${to}`]
     ? { symbol: `${from}${to}`, side: 'sell' }
     : { symbol: `${to}${from}`, side: 'buy' }
@@ -39,10 +38,10 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   } else {
     rate = B(mkt.ask).plus(scratch)
   }
-  rate = rate.toFixed(priceTick)
+  // TODO : PR sur B because erreur de merde
+  rate = rate.toFixed(pricePrec)
 
   if (!Number(rate)) {
-    console.log('Second return')
     return {}
   }
 
@@ -50,11 +49,15 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   if (side == 'sell') {
     baseQty = B(amount).toFixed(volPrec)
   } else {
-    baseQty = B(amount).times(rate).toFixed(volPrec)
-    rate = B(amount).div(baseQty)
+    baseQty = B(amount).div(rate).toFixed(volPrec)
+    if (!Number(baseQty)) {
+      console.log(`Div by zero. ${side} ${amount}${from}, moving ${amount} to ${to}`)
+      return {}
+    }
+    rate = B(amount).div(baseQty).toFixed(pricePrec)
   }
 
-  let quoteQty = baseQty.times(rate)
+  let quoteQty = B(baseQty).times(rate)
 
   // the actual amount we're moving (real input)
   const cost = side == 'sell'
@@ -77,7 +80,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     action: side,
     vol: baseQty,
     at: rate,
-    cost: side == 'sell' ? baseQty : quoteQty,
+    cost,
     greed,
     spread,
     scratch,
@@ -89,7 +92,9 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     ret
   }
 
-  console.log('OrderPath end')
+  console.log(`Moving ${amount}${from} to ${to}`)
+  console.log(`${side} ${baseQty} @${rate} (${quoteQty})`)
+
   return B(quoteQty).gt(minNotional)
     ? path
     : {}
