@@ -25,7 +25,6 @@
     "express": "^4.16.2",
     "node-binance-api": "^0.12.4",
     "redux": "^3.7.2",
-    "serve-index": "^1.9.1",
     "socket.io": "^2.4.1"
   }
 }

@@ -32,9 +32,7 @@ store.subscribe(_ => {
     .map(geometry => {
       return arbiter(geometry, state.balances[geometry[0]].available * balanceRatio)
     })
-    .filter(a => {
-      return a && a.ratio && B(a.ratio) != 0
-    })
+    .filter(a => a && a.ratio && B(a.ratio) != 0)
     .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
   
   if (arbitrages.length) {
