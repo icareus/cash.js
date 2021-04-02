@@ -36,49 +36,41 @@ const arbitrage = (state, run, amount) => {
     return ret
   }, { orders: [] })
 
-  let overRatio = {
-    ratio: null,
-    from: null,
-    to: null,
-    amount: null,
-    balances: {
-      from: null,
-      to: null
-    }
-  }
-  graph.orders.forEach(order => {
-    if (order.from && (Number(order.amount) > Number(order.available))) {
-      // ratio = Number(balances[order.from].available) / Number(order.amount)
-      ratio = Number(order.available) / Number(order.amount)
-      overRatio = (overRatio.ratio === null) || (ratio > overRatio.ratio)
-        ? {
-          ratio,
-          from: order.from,
-          to: order.to,
-          amount,
-          balances: {
-            from: balances[order.from].available,
-            to: balances[order.to].available
-          }
-        }
-        : overRatio
-    }
-  })
+  // let overRatio = {
+  //   ratio: null,
+  //   from: null,
+  //   to: null,
+  //   amount: null,
+  //   balances: {
+  //     from: null,
+  //     to: null
+  //   }
+  // }
 
-  if (overRatio.ratio === null) {
-    let pnl = graph.orders.reduce((ratios, order) => ({
-      ...ratios,
-      [order.from]: B(ratios[order.from] || 0).minus(order.cost || 0),
-      [order.to]: B(ratios[order.to] || 0).add(order.ret || 0)
-    }), {})
-    // return graph
+  for(order of graph.orders) {
+    if (order.from && (Number(order.amount) > Number(order.available))) {
+      ratio = Number(order.available) / Number(order.amount)
+      return (arbitrage(state, run, amount * ratio * 0.99))
+    } else if (!order.ret) { return null }
+  }
+
+  // if (overRatio.ratio === null) {
+    let pnl = graph.orders.reduce((ratios, order) => {
+      // if (B(order.available).lt(order.amount)) { die.error('This should never happen') }
+      return {
+        ...ratios,
+        [order.from]: B(ratios[order.from] || 0).minus(order.cost || 0),
+        [order.to]: B(ratios[order.to] || 0).add(order.ret || 0)
+      }
+    }, {})
+    // console.log(`Graph ${JSON.stringify({pnl, ...graph}, null, 2)}`)
     return {
       pnl,
       ...graph
     }
-  } else {
-    return (arbitrage(state, run, amount * overRatio.ratio * 0.9))
-  } 
+  // }// else {
+  //   return (arbitrage(state, run, amount * overRatio.ratio * 0.9))
+  // } 
 }
 
 module.exports = arbitrage
