@@ -19,13 +19,20 @@ const initExchange = _ => new Promise((resolve, reject) =>
   binance.exchangeInfo((e, infos) => e
     ? reject(e)
     : resolve(infos.symbols
-      .reduce((info, symbolInfo) => ({
+      .reduce((info, { symbol, filters, baseAsset, baseAssetPrecision, quoteAsset, quoteAssetPrecision, quotePrecision }) => ({
         ...info,
-        [symbolInfo.symbol]: symbolInfo.filters
-          .reduce((filters, fltr) => ({
-            ...filters,
-            [upperSnake2LowerCamel(fltr.filterType)]: fltr
-          }), {})
+        [symbol]: {
+          baseAsset,
+          baseAssetPrecision,
+          quoteAsset,
+          quoteAssetPrecision,
+          quotePrecision,
+          ...filters.reduce(
+            (filters, fltr) => ({...filters,
+              [upperSnake2LowerCamel(fltr.filterType)]: fltr
+            }), {})
+        },
+
       }), {})
     )
   )

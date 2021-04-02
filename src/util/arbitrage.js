@@ -1,3 +1,4 @@
+const die = require('./die')
 const B = require('./B')
 const orderPath = require('./orderPath')
 
@@ -10,7 +11,9 @@ const arbitrage = (state, run, amount) => {
     // market
   } = state
   if (run && !amount && amount !== 0) {
-    amount = B(balances[run[0]].available) * 0.1
+    amount = B(balances[run[0]].available).times(0.1)
+  } else if (B(amount).gt(balances[run[0]].available)) {
+    die.error("Welpp something broke")
   }
   const move = orderPath(state)
 
@@ -20,7 +23,7 @@ const arbitrage = (state, run, amount) => {
     const hop = move(sym, nxt, output)
     ret = {
       run,
-      input: arbitrage.input || hop.cost,
+      input: amount,
       ...arbitrage,
       output: hop.ret || 0,
       orders: [...arbitrage.orders, hop],

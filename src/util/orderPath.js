@@ -87,7 +87,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     mkt,
     notional: quoteQty,
     minNotional,
-    ret: B(ret).times(fee)
+    ret: B(ret).times(fee).toFixed(side == 'buy' ? info.basePrecision : info.quotePrecision)
   }
 
   // console.log(`Moving ${amount}${from} to ${to}`)

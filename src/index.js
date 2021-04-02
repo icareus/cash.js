@@ -38,6 +38,7 @@ store.subscribe(_ => {
     .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
   
   if (arbitrages.length) {
+    // console.log('graph', arbitrages[arbitrages.length - 1])
     io.emit('graph', arbitrages[arbitrages.length - 1])
   } else {
     // Complain about something ?
@@ -54,6 +55,7 @@ store.subscribe(_ => {
       const arbitrage = costworthy[costworthy.length - 1]
 
       io.emit('arbitrage', { ...arbitrage, time: new Date().getTime() })
+      console.log(graph.pnl)
       const key = lock(arbitrage)
 
       if (key) {
