@@ -53,8 +53,6 @@ store.subscribe(_ => {
     if (costworthy.length) {
       const arbitrage = costworthy[costworthy.length - 1]
 
-      die(JSON.stringify(arbitrage, null, 2))
-
       io.emit('arbitrage', { ...arbitrage, time: new Date().getTime() })
       const key = lock(arbitrage)
 
