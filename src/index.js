@@ -65,14 +65,12 @@ store.subscribe(_ => {
           .then(passThrough(negociated => {
             io.emit('arbitrage', { ...arbitrage, time: key })
             log.hard({ ...arbitrage, time: key, negociated }) }))
-          .then(passThrough(x => {
-            console.log(x, "HERE")
-          }))
+          .then(passThrough(console.log))
           .then(watchOrders).catch(e => die.error(e.body || e, 'HALAKILI'))
           .then(passThrough(_ => lock.unlock(key)))
           .then(resolvedOrders => {
             console.log(JSON.stringify(resolvedOrders, null, 2), 'Resolved.')
-            // const arbitrage = { ...arbitrage, time: key, orders: resolvedOrders }
+
             result = {
               ...arbitrage,
               time: key,

@@ -12,7 +12,6 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
 
   if (!side || !symbol ) { throw(`Invalid path from ${from} to ${to}`) }
 
-  // console.log(symbol, info[symbol], 'In orderPath')
   const volTick = info[symbol].lotSize.stepSize
   const volPrec = (Number(volTick).toString().split('.')[1] || '').length
   const priceTick = info[symbol].priceFilter.tickSize
@@ -24,7 +23,6 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   }
   if (!mkt.bid || !mkt.ask) {
     die(`No bid or ask for ${mkt}`)
-    console.log('Return chibré')
     return {}
   }
 
@@ -51,7 +49,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   } else {
     baseQty = B(amount).div(rate).toFixed(volPrec)
     if (!Number(baseQty)) {
-      console.log(`Div by zero. ${side} ${amount}${from}, moving ${amount} to ${to}`)
+      // console.log(`Div by zero. ${side} ${amount}${from}, moving ${amount}${from} to ${baseQty}${to} at ${rate}`)
       return {}
     }
     rate = B(amount).div(baseQty).toFixed(pricePrec)
@@ -89,11 +87,11 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     mkt,
     notional: quoteQty,
     minNotional,
-    ret
+    ret: B(ret).times(fee)
   }
 
-  console.log(`Moving ${amount}${from} to ${to}`)
-  console.log(`${side} ${baseQty} @${rate} (${quoteQty})`)
+  // console.log(`Moving ${amount}${from} to ${to}`)
+  // console.log(`${side} ${baseQty} @${rate} (${quoteQty})`)
 
   return B(quoteQty).gt(minNotional)
     ? path

@@ -55,6 +55,7 @@
       socket.on('graph', graph => {
         const data = {// ...graph }
           path: graph.run,
+          pnl: graph.pnl,
           hops: graph.orders.reduce((hops, { from, to, action, symbol, vol, ret }) => ([
             ...hops,
             {
@@ -69,7 +70,7 @@
           input: graph.orders[0].cost,
           output: graph.output,
           profit: graph.profit,
-          ratio: graph.ratio
+          ratio: graph.ratio,
         }
         document.querySelector('#graph > pre')
           .innerHTML = JSON.stringify({

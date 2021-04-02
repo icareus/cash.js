@@ -63,7 +63,16 @@ const arbitrage = (state, run, amount) => {
   })
 
   if (overRatio.ratio === null) {
-    return graph
+    let pnl = graph.orders.reduce((ratios, order) => ({
+      ...ratios,
+      [order.from]: B(ratios[order.from] || 0).minus(order.cost || 0),
+      [order.to]: B(ratios[order.to] || 0).add(order.ret || 0)
+    }), {})
+    // return graph
+    return {
+      pnl,
+      ...graph
+    }
   } else {
     return (arbitrage(state, run, amount * overRatio.ratio * 0.9))
   } 
