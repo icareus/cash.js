@@ -53,10 +53,11 @@
       })
 
       socket.on('graph', graph => {
+        console.log(graph)
         const data = {// ...graph }
           path: graph.run,
           pnl: graph.pnl,
-          hops: graph.orders.reduce((hops, { from, to, action, symbol, vol, ret }) => ([
+          hops: graph.orders.reduce((hops, { from, to, action, symbol, vol, quote, ret }) => ([
             ...hops,
             {
               from,
@@ -64,6 +65,7 @@
               symbol,
               action,
               vol,
+              quote,
               ret
             }
           ]), []),

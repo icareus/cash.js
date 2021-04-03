@@ -78,6 +78,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
     action: side,
     vol: baseQty,
     at: rate,
+    quote: quoteQty,
     cost,
     greed,
     spread,
