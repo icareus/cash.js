@@ -1,6 +1,9 @@
 {
     "verbose": true,
-    "ignore": ["./logs/*.json"],
+    "ignore": [
+        "./logs/*.json",
+        "public/logs/*"
+    ],
     "ext": "js, json, env",
     "watch": [
         "public",
