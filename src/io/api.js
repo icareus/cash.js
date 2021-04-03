@@ -1,9 +1,6 @@
 const express = require('express')
-const api = express()
+const www = express()
 
-// var serveIndex = require('serve-index')
+www.use(express.static('public'))
 
-// api.use('/logs', serveIndex('public/logs', {icons: true}))
-api.use(express.static('public'))
-
-module.exports = api
+module.exports = www
