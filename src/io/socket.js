@@ -1,3 +1,5 @@
+// const store = require('../store')
+
 const {
   TITLE: title = 'Arbitrage bot'
 } = process.env
