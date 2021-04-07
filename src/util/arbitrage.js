@@ -12,8 +12,14 @@ const arbitrage = (state, run, amount) => {
   } = state
   if (run && !amount && amount !== 0) {
     amount = B(balances[run[0]].available).times(0.1)
-  } else if (B(amount).gt(balances[run[0]].available)) {
-    die.error("Welpp something broke")
+  } else if (B(amount).lt(0)) {
+    console.warn(`Requested amount (${amount}) is lesser than zero. Will convert to absolute value.`)
+    amount = abs(amount)
+  }
+  if (B(amount).gt(balances[run[0]].available)) {
+    console.warn(`Requested amount (${amount}) greater than available balance (${balances[run[0]].available})`)
+    console.warn(`Will auto-correct, but please set BALANCE_RATIO lesser than one.`)
+    amount = balances[run[0]].available
   }
   const move = orderPath(state)
 
