@@ -13,6 +13,37 @@ const upperSnake2LowerCamel = str => str.split('_')
     : word.toLowerCase())
   .join('')
 
+const onBalanceUpdate = ({ B: updatedBalances }) => {
+  const balances = updatedBalances.reduce((balances, balance) => ({
+    ...balances,
+    [balance.a]: {
+      available: balance.f,
+      onOrder: balance.l
+    }
+  }), {})
+  const action = { type: 'update.balances',
+    balances
+  }
+  store.dispatch(action)
+}
+
+const onOrderUpdate = ({ S, q, s, p, o, i, x, X }) => {
+  const update = {
+    type: 'update.order',
+    order: {
+      side: S,
+      quantity: q,
+      symbol: s,
+      price: p,
+      orderType: o,
+      execType: x,
+      Id: i,
+      status: X
+    }
+  }
+  store.dispatch(update)
+}
+
 const initExchange = _ => new Promise((resolve, reject) =>
   // Get market structure/format.
   // Reduce to object keyed with symbols, instead of array of stuff
@@ -67,20 +98,8 @@ const initBalances = _ => {
     })
     return balances
   }).then(balances => {
-    binance.websockets.userData(({ B: updatedBalances }) => {
-      const balances = updatedBalances.reduce((balances, balance) => ({
-        ...balances,
-        [balance.a]: {
-          available: balance.f,
-          onOrder: balance.l
-        }
-      }), {})
-      const action = { type: 'update.balances',
-        balances
-      }
-      store.dispatch(action)
-    })
-    
+    binance.websockets.userData(onBalanceUpdate, onOrderUpdate)
+
     return balances
   }).then(balances => new Promise((resolve, reject) => {
       binance.bookTickers((error, tickers) => {

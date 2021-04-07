@@ -1,6 +1,13 @@
 const express = require('express')
 const www = express()
 
-www.use(express.static('public'))
+if (!process.env.NO_WEBUI) {
+    www.use(express.static('public'))
+}
+www.get('/status', (req, res) => {
+    res.json({
+        status: 'OK'
+    })
+})
 
 module.exports = www

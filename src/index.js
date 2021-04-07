@@ -6,7 +6,7 @@ const B = require('./util/B')
 
 console.log('Loading i/o features...')
 const {
-  binance,
+  // binance,
   log,
   socket: io
 } = require('./io')
