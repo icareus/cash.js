@@ -9,14 +9,27 @@
 
     <script>
       const audioPlayer = document.getElementById('tuturu')
+      const audioPlay = soundName => { audioPlayer.src=`audio/${soundName}.mp3` }
       window.onload = _ => audioPlayer.play()
       window.onreadystatechange = _ => { window.audioPlayer = document.getElementById('tuturu' )}
+
       const socket = io()
-      const arbitrages = {}
       socket.on('title', t => document.title = t)
 
+      const arbitrages = {}
+      const renderArbitrages = _ => {
+        arbitragesRenderer.querySelector('pre').innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
+          ...json,
+          [new Date(Number(time)).toLocaleString()]: {
+            ...arbitrages[time],
+            resolved: arbitrages[time].resolved
+              && new Date(arbitrages[time].resolved).toLocaleString()
+          }
+        }), {}), null, 2)
+      }
+
       socket.on('state', state => {
-        const stateRenderer = document.querySelector('#state > pre')
+        const stateRenderer = document.querySelector('#stateRenderer > pre')
         const profitRenderer = document.querySelector('#profit > pre')
         try {
           const balances = JSON.parse(stateRenderer.innerHTML).balances
@@ -34,14 +47,10 @@
           }
         } catch {// First time getting state, JSON.parse threw
           // console.log('Got first state.', state)
-          audioPlayer.src="audio/startup.mp3"
+          audioPlay('startup')
           for (token in state.balances) {
             profits[token] = 0
           }
-          // profits = Object.keys(state.balances).reduce((profits, token) => ({
-          //   ...profits,
-          //   [token]: 0
-          // }), state.balances)
           document.querySelector('#profits > pre')
             .innerHTML = JSON.stringify(profits, null, 2)
         }
@@ -74,30 +83,30 @@
           profit: graph.profit,
           ratio: graph.ratio,
         }
-        document.querySelector('#graph > pre')
+        document.querySelector('#graphRenderer > pre')
           .innerHTML = JSON.stringify({
             ...data,
             time: new Date(data.time || new Date()).toLocaleString()
           }, null, 2)
       })
 
+      socket.on('arbitrage', arb => {
+        console.log(arb)
+        if (!arbitrages[arb.time]) {
+          arbitrages[arb.time] = arb
+          audioPlay('tuturu')
+          renderArbitrages()
+        }
+      })
       socket.on('arbitrages', update => {
-        const elem = document.querySelector('#arbitrages > pre')
         for (timestamp in update) {
           const time = Number(timestamp)
           if (!arbitrages[time]) {
             arbitrages[time] = update[timestamp]
-            audioPlayer.src="audio/tuturu.mp3"
+            audioPlay('tuturu')
+            renderArbitrages()
           }
         }
-        elem.innerHTML = JSON.stringify(Object.keys(arbitrages).reduce((json, time) => ({
-          ...json,
-          [new Date(Number(time)).toLocaleString()]: {
-            ...arbitrages[time],
-            resolved: arbitrages[time].resolved
-              && new Date(arbitrages[time].resolved).toLocaleString()
-          }
-        }), {}), null, 2)
       })
 
       socket.on('resolved', arbitrage => {
@@ -110,7 +119,7 @@
           profit,
           resolved: new Date().getTime()
         }
-        audioPlayer.src = 'audio/rupee-collect.mp3'
+        audioPlay('rupee-collect')
       })
     </script>
   </head>
@@ -127,15 +136,15 @@
       </div>
     </div>
     <div class="renderer-wrapper">
-      <div id="state" class="renderer">
+      <div id="stateRenderer" class="renderer">
         State:
         <pre>No data (yet).</pre>
       </div>
-      <div id="graph" class="renderer">
+      <div id="graphRenderer" class="renderer">
         <span>Most profitable graph:</span>
         <pre>No data (yet).</pre>
       </div>
-      <div id="arbitrages" class="renderer">
+      <div id="arbitragesRenderer" class="renderer">
         <span>Arbitrages:</span>
         <pre>No data (yet).</pre>
       </div>

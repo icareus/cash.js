@@ -5,7 +5,7 @@ const B = require('./src/util/B')
 
 const store = require('./src/store')
 const { binance } = require('./src/io')
-const { shitcoins } = require('./src/util/constants')
+const { shitcoins, shitpaths } = require('./src/util/constants')
 
 const upperSnake2LowerCamel = str => str.split('_')
   .map((word, i) => i
@@ -108,6 +108,7 @@ const initBalances = _ => {
         const tokens = Object.keys(balances)
         const marketData = tickers
           .filter(({ symbol }) => {
+            if (shitpaths.includes(symbol)) { return false }
             for (token of tokens) {
               if (symbol.includes(token) && tokens.includes(symbol.replace(token, ''))) {
                 return true

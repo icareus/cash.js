@@ -1,40 +1,56 @@
 const binance = require('../io/binance')
+const store = require('../store')
 const B = require('./B')
 const die = require('./die')
 
 const BELL = '\u0007'
 
-const order = ({ action, symbol, vol, at: rate, ...stuff }) =>
-  new Promise((resolve, reject) => {
-    const handler = (ko, ok) => {
-      if (ko) { reject(ko) } else { resolve(ok) }
-    }
+const order = o => {
+  const { action, symbol, vol, at: rate, arbTime, ...stuff } = o
+  const ret = new Promise((resolve, reject) => {
     const params = [
       symbol,
-      `${Number(B(vol))}`,
-      `${Number(B(rate))}`,
+      `${Number(vol)}`,
+      `${Number(rate)}`,
       {
         type: 'LIMIT',
         // timeInForce: 'FOK'
       }
     ]
+    console.log('Order:', JSON.stringify(o, null, 2))
     console.log(`Ordering: ${action}`, {
       symbol,
       vol: Number(vol),
       rate: Number(rate)
     })
-    binance[action](...params, handler)
-  }).catch(e => console.error(`Order error: ${e.body}`))
+    binance[action](...params, (ko, ok) => {
+      if (ko) { reject(ko) } else {
+        resolve({
+          ...ok,
+          arbTime
+        })
+      }
+    })
+  })
 
-const negociate = arbitrage => console.log('TUTURU', JSON.stringify(arbitrage, null, 2)) ||
-  Promise.all(arbitrage.orders
-    .map(o => order(o).catch(e => console.error('Error ordering: ', e.body || e.message)))
-  ).catch(e => die(`CAUGHT ! ${e.body || e}`))
-  .then(nego => {
-    console.log('Negociated:', nego)
-    return nego
+  return ret
+}
+
+const negociate = arbitrage => Promise.all(arbitrage.orders
+  .map(o => order({
+      ...o,
+      arbTime: arbitrage.time
+    })
+  )).catch(e => die(`CAUGHT ! ${e.body || e}`))
+  .then(orders => {
+    store.dispatch({
+      type: 'orders.update',
+      orders
+    })
+    console.log('Negociated:', orders)
+    return orders
   }).catch(e => {
-    console.error('Negociation error.', e.body.msg || e.body || e)
+    console.error('Negociation error.', e.body || e)
   })
 
 

@@ -4,6 +4,9 @@ const passThrough = require('./util/passThrough')
 const die = require('./util/die')
 const B = require('./util/B')
 
+let lastTimeUpdated = 0
+let skippedTicks = 0
+
 console.log('Loading i/o features...')
 const {
   // binance,
@@ -17,7 +20,7 @@ const {
 } = require('./store/selectors')
 const store = require('./store')
 
-const { thresholds } = require('./util/constants')
+const { thresholds, stateTickInterval } = require('./util/constants')
 const { balanceRatio } = require('./util/constants').hyper
 
 const negotiate = require('./util/negotiate')
@@ -32,22 +35,15 @@ store.subscribe(_ => {
     const arbitrages = state.graph
       .map(geometry => {
         return arbiter(geometry, state.balances[geometry[0]].available * balanceRatio)
-      })
-      .filter(a => a && a.ratio && B(a.ratio) != 0)
-      .sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
-    
-    if (arbitrages.length) {
-      // console.log('graph', arbitrages[arbitrages.length - 1])
-      io.emit('graph', arbitrages[arbitrages.length - 1])
-    } else {
-      // Complain about something ?
-    }
+      }).filter(a => a && a.ratio && !B(a.ratio).eq(0))
   
     const mindworthy = arbitrages
-    .filter(arb => arb.ratio ? B(arb.ratio).gt(B(thresholds.log)) : null)
+      .filter(arb => {
+        return arb.ratio && B(arb.ratio).gt(thresholds.log)
+      }).sort((a1, a2) => a1.ratio - a2.ratio)// Highest last
   
     const costworthy = mindworthy
-    .filter(arb => B(arb.ratio).gt(B(thresholds.bid)))
+      .filter(arb => B(arb.ratio).gt(B(thresholds.bid)))
   
     if (!lock.getActive()) {
       if (costworthy.length) {
@@ -56,20 +52,20 @@ store.subscribe(_ => {
           time: new Date().getTime()
         }
   
-        io.emit('arbitrage', arbitrage)
-        const key = lock(arbitrage)
+        const key = lock(arbitrage, arbitrage.time)
   
         if (key) {
-          console.clear()
+          store.dispatch({
+            type: 'arbitrage.add',
+            arbitrage
+          })
           console.info(`Got lock: ${key}`)
-          console.log(arbitrage.pnl)
   
           negotiate(arbitrage).catch(e => console.error('BLEHHH', e.body || e))
           // new Promise((resolve) => resolve(arbitrage))
             .then(passThrough(negociated => {
-              io.emit('arbitrage', { ...arbitrage, time: key })
-              log.hard({ ...arbitrage, time: key, negociated }) }))
-            .then(passThrough(console.log))
+              io.emit('arbitrage', arbitrage)
+              log.hard({ ...arbitrage, negociated }) }))
             .then(watchOrders).catch(e => die.error(e.body || e, 'HALAKILI'))
             .then(passThrough(_ => lock.unlock(key)))
             .then(resolvedOrders => {
@@ -85,16 +81,25 @@ store.subscribe(_ => {
             }).catch(e => die.error('Arbitrage resolution error',e.body || e))
         }
       }
-    } else {
-      io.emit('arbitrages', lock.getActive())
     }
-    // TODO: debounce state emit
-    // console.log('Emit state')
-    io.emit('state', {
-      balances: simpleBalances(state),
-      profits: state.profits,
-      market: simpleMarkets(state),
-    })
+    if (mindworthy.length) {
+      io.emit('graph', mindworthy[mindworthy.length - 1])
+    }
+    // TODO: debounce state emit ?
+    const curTime = new Date().getTime()
+    if (curTime - lastTimeUpdated >= stateTickInterval) {
+      lastTimeUpdated = curTime
+      console.log(`Tick ${curTime} (skipped ${skippedTicks})`)
+      io.emit('state', {
+        balances: simpleBalances(state),
+        profits: state.profits,
+        market: simpleMarkets(state),
+        skippedTicks
+      })
+      skippedTicks = 0
+    } else {
+      skippedTicks += 1
+    }
   } catch (error) {
     store.dispatch(error)
   }

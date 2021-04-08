@@ -9,11 +9,12 @@ const checkOrder = order => new Promise((resolve, reject) => {
   } = order
 
   return binance.orderStatus(symbol, orderId, (error, status) => error
-    ? reject({ ...order, status: error.body })
+    ? reject({ status: error.body || error, order })
     : resolve(status))
 })
 
 const watchOrders = orders => new Promise((resolve, reject) => {
+  console.log('In watchOrders promise', JSON.stringify(orders, null, 2))
   const i = setInterval(_ => {
     Promise.all(orders.map(o => checkOrder(o).catch(e => die('Error ordering :', e))))
       .catch(e => die(e, 'SEPPUKU'))
