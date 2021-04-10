@@ -89,7 +89,7 @@ store.subscribe(_ => {
     const curTime = new Date().getTime()
     if (curTime - lastTimeUpdated >= stateTickInterval) {
       lastTimeUpdated = curTime
-      console.log(`Tick ${curTime} (skipped ${skippedTicks})`)
+      // console.log(`Tick ${curTime} (skipped ${skippedTicks})`)
       io.emit('state', {
         balances: simpleBalances(state),
         profits: state.profits,
