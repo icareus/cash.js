@@ -54,7 +54,7 @@ store.subscribe(_ => {
   }
 })
 
-setInterval(_ => {
+arbScan = _ => {
   const state = store.getState()
 
   let arbiter = require('./util/arbitrage')(state)
@@ -113,4 +113,7 @@ setInterval(_ => {
   if (mindworthy.length) {
     io.emit('graph', mindworthy[mindworthy.length - 1])
   }
-}, 1000/parSec)
+  setTimeout(arbScan, 0)
+}
+
+ setTimeout(arbScan, 0)
