@@ -12,12 +12,14 @@ const middleware = store => next => action => {
         symbols.forEach(symbol => {
             binance.websockets.bookTickers(symbol, update => {
                 const {
+                    updateId: id,
                     symbol,
                     bestBid: bid,
                     bestAsk: ask
                 } = update
                 const action = { type: 'update.symbol',
                     data: {
+                        id,
                         symbol,
                         bid,
                         ask

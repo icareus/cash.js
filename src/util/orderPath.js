@@ -34,7 +34,7 @@ const orderPath = ({ balances, market, marketInfo: info }) => (from, to, amount 
   if (side == 'buy') {
     rate = B(mkt.ask).minus(scratch)
   } else {
-    rate = B(mkt.ask).plus(scratch)
+    rate = B(mkt.bid).plus(scratch)
   }
   // TODO : PR sur B because erreur de merde
   rate = rate.toFixed(pricePrec)

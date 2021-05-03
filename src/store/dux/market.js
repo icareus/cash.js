@@ -3,11 +3,17 @@ const B = require('../../util/B')
 const Symbol = symbol => (state = { symbol }, update) => {
   const {
     bid,
-    ask
+    ask,
+    id
   } = update.data
+  if (state.id && state.id > id) {
+    console.log(`Declined update ${id} on ${symbol}`)
+    return state
+  }
 
   const newState = {
     ...state,
+    id,
     ask,
     bid,
     spread: B(ask).minus(bid)
