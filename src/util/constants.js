@@ -15,7 +15,8 @@ const constants = {
   shitpaths: process.env.SHITPATHS
     ? JSON.parse(process.env.SHITPATHS.replace(/\'/g, '"'))
     : [],
-  stateTickInterval: process.env.STATE_TICK_INTERVAL || 100
+  stateTickInterval: process.env.STATE_TICK_INTERVAL || 100,
+  parSec: process.env.ARBITRAGE_PER_SECONDS || 12
 }
 
 constants.shitcoins.length && console

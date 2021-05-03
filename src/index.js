@@ -20,7 +20,7 @@ const {
 } = require('./store/selectors')
 const store = require('./store')
 
-const { thresholds, stateTickInterval } = require('./util/constants')
+const { thresholds, stateTickInterval, parSec } = require('./util/constants')
 const { balanceRatio } = require('./util/constants').hyper
 
 const negotiate = require('./util/negotiate')
@@ -113,4 +113,4 @@ setInterval(_ => {
   if (mindworthy.length) {
     io.emit('graph', mindworthy[mindworthy.length - 1])
   }
-}, 1000/50)
+}, 1000/parSec)
