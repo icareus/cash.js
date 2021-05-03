@@ -1,5 +1,8 @@
 const B = require('../../util/B')
 
+let sec = null
+let secTicks = null
+
 const Symbol = symbol => (state = { symbol }, update) => {
   const {
     bid,
@@ -21,6 +24,13 @@ const Symbol = symbol => (state = { symbol }, update) => {
       : ask - bid
   }
   // if (symbol.symbol == 'ETHBTC') {
+  //   currSec = new Date().getSeconds()
+  //   if (currSec != sec) {
+  //     console.log(`sec ${sec} ticks ${secTicks}`)
+  //     sec = currSec
+  //     secTicks = 0
+  //   }
+  //   secTicks += 1
   //   console.log(JSON.stringify(newState, null, 2))
   // }
   return newState
