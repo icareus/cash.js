@@ -113,7 +113,9 @@ arbScan = _ => {
   if (mindworthy.length) {
     io.emit('graph', mindworthy[mindworthy.length - 1])
   }
-  setTimeout(arbScan, 0)
+  setTimeout(arbScan, 20)
 }
 
- setTimeout(arbScan, 0)
+// setInterval(arbScan, 1000 / parSec)
+
+ setTimeout(arbScan, 20)
