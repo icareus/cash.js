@@ -13,11 +13,16 @@ const Symbol = symbol => (state = { symbol }, update) => {
 
   const newState = {
     ...state,
-    id,
-    ask,
-    bid,
-    spread: B(ask).minus(bid)
+    // id,
+    ask: ask || state.ask,
+    bid: bid || state.bid,
+    spread: ask && bid
+      ? B(ask).minus(bid)
+      : ask - bid
   }
+  // if (symbol.symbol == 'ETHBTC') {
+  //   console.log(JSON.stringify(newState, null, 2))
+  // }
   return newState
 }
 

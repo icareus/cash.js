@@ -119,6 +119,8 @@ const initBalances = _ => {
             ...markets,
             [ticker.symbol]: ticker
           }), {})
+        // console.log(marketData)
+        // console.log('INIT marketData')
         resolve(marketData)
       })
     }).then(symbols => store.dispatch({
